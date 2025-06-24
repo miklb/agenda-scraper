@@ -2,8 +2,6 @@ const { Builder, By, until } = require('selenium-webdriver');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios');
-const pdfParse = require('pdf-parse');
 
 function debugCharCodes(str) {
     return Array.from(str).map(char => `${char}: ${char.charCodeAt(0)}`).join('\n');
@@ -107,263 +105,155 @@ function cleanAgendaContent(content) {
 }
 
 /**
- * Simplified PDF extraction with better error handling
- */
-async function extractBackgroundFromPDF(pdfUrl) {
-    try {
-        console.log(`Downloading PDF: ${pdfUrl}`);
-        
-        // First, check what we're actually getting
-        const headResponse = await axios.head(pdfUrl);
-        console.log(`Content-Type: ${headResponse.headers['content-type']}`);
-        console.log(`Content-Length: ${headResponse.headers['content-length']}`);
-        
-        // If it's not a PDF, skip
-        if (!headResponse.headers['content-type']?.includes('pdf')) {
-            console.log('Response is not a PDF file');
-            return "Summary sheet is not available as a PDF file.";
-        }
-        
-        // Download the actual PDF
-        const response = await axios.get(pdfUrl, { 
-            responseType: 'arraybuffer',
-            timeout: 10000, // 10 second timeout
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-            }
-        });
-        
-        console.log(`Downloaded ${response.data.byteLength} bytes`);
-        
-        // Check if the downloaded data looks like a PDF
-        const pdfHeader = response.data.slice(0, 5);
-        const headerString = String.fromCharCode(...pdfHeader);
-        
-        if (!headerString.startsWith('%PDF')) {
-            console.log('Downloaded file does not have PDF header');
-            return "Downloaded file is not a valid PDF.";
-        }
-        
-        // Try to parse with pdf-parse
-        const data = await pdfParse(response.data);
-        const text = data.text;
-        
-        console.log(`Extracted ${text.length} characters from PDF`);
-        
-        // Look for background section
-        const backgroundMatch = text.match(/BACKGROUND:(.*?)(?:RECOMMENDATION:|FISCAL IMPACT:|$)/s);
-        
-        if (backgroundMatch && backgroundMatch[1]) {
-            const background = backgroundMatch[1].trim();
-            console.log(`Found background section: ${background.substring(0, 100)}...`);
-            return background;
-        } else {
-            console.log('No BACKGROUND: section found in PDF text');
-            // Log first 500 chars to see what we got
-            console.log(`PDF text preview: ${text.substring(0, 500)}`);
-            return "No background section found in the summary sheet.";
-        }
-        
-    } catch (error) {
-        console.error(`Error extracting background from PDF ${pdfUrl}:`, error.message);
-        
-        if (error.code === 'ECONNRESET' || error.code === 'ENOTFOUND') {
-            return "Network error while downloading summary sheet.";
-        } else if (error.message.includes('Invalid PDF')) {
-            return "Summary sheet PDF file appears to be corrupted or invalid.";
-        } else {
-            return "Unable to retrieve background information from the summary sheet.";
-        }
-    }
-}
-
-/**
- * Gets the summary sheet URL for a specific agenda item
- * @param {string} meetingId - The meeting ID
- * @param {string} itemId - The agenda item ID
- * @param {string} publishId - The publish ID (required parameter)
- * @returns {string} - URL to the summary sheet PDF
- */
-function getSummarySheetUrl(meetingId, itemId, publishId) {
-    return `https://tampagov.hylandcloud.com/221agendaonline/Documents/DownloadFileBytes/Summary%20Sheet-%20COVER%20SHEET.pdf?documentType=1&meetingId=${meetingId}&itemId=${itemId}&publishId=${publishId}&isSection=False&isAttachment=True`;
-}
-
-/**
  * Main scraping function
  */
 async function scrapeWithSelenium(url, meetingId) {
     let driver = await new Builder().forBrowser('chrome').build();
-    
     try {
+        console.log(`Loading page: ${url}`);
         await driver.get(url);
         
-        // Wait for content to load
-        await driver.wait(until.elementLocated(By.css('table')), 10000);
+        // Wait longer for the page to fully load and JavaScript to execute
+        console.log('Waiting for page to fully load...');
+        await new Promise(res => setTimeout(res, 5000)); // Initial wait
         
+        // Get the full page source after JavaScript execution
+        console.log('Getting page source after JavaScript execution...');
         let pageSource = await driver.getPageSource();
+        
+        // Save the full page source for debugging
+        const debugDir = path.join(__dirname, 'debug');
+        if (!fs.existsSync(debugDir)) fs.mkdirSync(debugDir);
+        const debugFile = path.join(debugDir, `meeting_${meetingId}_full_page.html`);
+        fs.writeFileSync(debugFile, pageSource);
+        console.log(`Saved full page HTML to ${debugFile}`);
+        
+        // Load the page source into cheerio
         const $ = cheerio.load(pageSource);
         
-        // Initialize an array to hold the ordered list items and their IDs
-        let orderedListItems = [];
-        let itemIds = [];
+        // Look for agenda items with proper File Numbers (using working selector)
+        console.log('Searching for agenda items...');
         
-        // Verify tables exist
-        const tables = $('table');
-        if (tables.length === 0) {
-            console.error(`No tables found for meeting ${meetingId}`);
-            return false;
-        }
+        let agendaItems = [];
         
-        // Find all tables with the specified structure
-        tables.each((i, table) => {
-            const hasNumberSpan = $(table).find('td > p > span').filter((i, span) => {
-                return /^\d+\.$/.test($(span).text().trim());
-            }).length > 0;
+        // Look specifically for links with "File No." that are actual agenda items
+        $('a[id^="lnk"]').each((i, link) => {
+            const $link = $(link);
+            const text = $link.text().trim();
+            const href = $link.attr('href');
+            const id = $link.attr('id');
             
-            if (hasNumberSpan) {
-                // Extract the table content and preserve structure
-                let combinedContent = '';
-                let itemId = null;
-                let publishId = null;
+            // Only include items that start with "File No." and look like actual agenda items
+            if (text.startsWith('File No.') && text.length > 10) {
+                // Extract the agenda item ID from the JavaScript href
+                const agendaItemIdMatch = href && href.match(/loadAgendaItem\((\d+),/);
+                const agendaItemId = agendaItemIdMatch ? agendaItemIdMatch[1] : null;
                 
-                // Look for JavaScript links with loadAgendaItem function
-                const jsLinks = $(table).find('a[href^="javascript:loadAgendaItem"]');
-                if (jsLinks.length > 0) {
-                    jsLinks.each((j, link) => {
-                        if (itemId) return; // Skip if we already found an ID
-                
-                        const href = $(link).attr('href');
-                        // Extract item ID from loadAgendaItem(ID,false) pattern
-                        const itemIdMatch = href.match(/loadAgendaItem\((\d+),/);
-                        if (itemIdMatch && itemIdMatch[1]) {
-                            itemId = itemIdMatch[1];
-                            console.log(`Found itemId ${itemId} from JavaScript loadAgendaItem function`);
-                        }
-                    });
-                }
-                
-                // Look specifically for summary sheet PDF links to get publishId
-                const summarySheetLinks = $(table).find('a[href*="Summary%20Sheet-%20COVER%20SHEET"], a[href*="Summary Sheet- COVER SHEET"]');
-                if (summarySheetLinks.length > 0) {
-                    summarySheetLinks.each((j, link) => {
-                        const href = $(link).attr('href');
-                
-                        // Extract itemId if we don't have it yet
-                        if (!itemId) {
-                            const itemIdMatch = href.match(/[&?]itemId=(\d+)/i);
-                            if (itemIdMatch && itemIdMatch[1]) {
-                                itemId = itemIdMatch[1];
-                                console.log(`Found itemId ${itemId} from summary sheet PDF link`);
-                            }
-                        }
-                
-                        // Extract publishId
-                        const publishIdMatch = href.match(/[&?]publishId=(\d+)/i);
-                        if (publishIdMatch && publishIdMatch[1]) {
-                            publishId = publishIdMatch[1];
-                            console.log(`Found publishId ${publishId} from summary sheet PDF link`);
-                        }
-                    });
-                }
-                
-                // Process content
-                $(table).find('td').each((i, td) => {
-                    let fileNoText = '';
-                    let descriptionText = '';
-                    
-                    $(td).find('p').each((j, p) => {
-                        let text = $(p).text().trim();
-                        if (text) {
-                            if (text.includes('File No.')) {
-                                fileNoText = text;
-                            } else {
-                                descriptionText += text + ' ';
-                            }
-                        }
-                    });
-                    
-                    if (fileNoText || descriptionText) {
-                        combinedContent += (fileNoText ? fileNoText + ' ' : '') + descriptionText.trim() + '\n';
-                    }
+                agendaItems.push({
+                    number: agendaItems.length + 1,
+                    fileNumber: text,
+                    id: id,
+                    href: href,
+                    agendaItemId: agendaItemId
                 });
                 
-                if (combinedContent.trim()) {
-                    orderedListItems.push(combinedContent.trim());
-                    // Store both itemId and publishId
-                    itemIds.push({ itemId, publishId });
-                }
+                console.log(`Found agenda item ${agendaItems.length}: ${text} (ID: ${id}, AgendaItemId: ${agendaItemId})`);
             }
         });
         
-        // Alternative approach: Search the entire page for summary sheet links
-        if (itemIds.some(id => id === null)) {
-            console.log("Some items are missing IDs, searching entire page for summary sheet links...");
-            
-            // Find ALL summary sheet links on the page
-            const allSummarySheetLinks = $('a[href*="Summary%20Sheet-%20COVER%20SHEET"], a[href*="Summary Sheet- COVER SHEET"]');
-            console.log(`Found ${allSummarySheetLinks.length} summary sheet links on the page`);
-            
-            const foundItemIds = [];
-            allSummarySheetLinks.each((i, link) => {
-                const href = $(link).attr('href');
-                const itemIdMatch = href.match(/[&?]itemId=(\d+)/i);
-                if (itemIdMatch && itemIdMatch[1]) {
-                    foundItemIds.push(itemIdMatch[1]);
-                    console.log(`Summary sheet link ${i+1}: itemId=${itemIdMatch[1]}`);
-                }
-            });
-            
-            // Try to match found IDs to agenda items that don't have IDs
-            let idIndex = 0;
-            for (let i = 0; i < itemIds.length; i++) {
-                if (itemIds[i] === null && idIndex < foundItemIds.length) {
-                    itemIds[i] = foundItemIds[idIndex++];
-                    console.log(`Assigned itemId ${itemIds[i]} to agenda item ${i+1}`);
-                }
-            }
-        }
+        console.log(`Found ${agendaItems.length} agenda items with File Numbers`);
         
-        // Verify content was extracted
-        if (orderedListItems.length === 0) {
-            console.error(`No content extracted for meeting ${meetingId}`);
+        if (agendaItems.length === 0) {
+            console.error(`No agenda item links found for meeting ${meetingId}`);
             return false;
         }
-
-        // Download and extract background sections from PDFs where we have item IDs
-        const backgroundSections = [];
-        for (let i = 0; i < itemIds.length; i++) {
-            if (itemIds[i] && itemIds[i].itemId && itemIds[i].publishId) {
-                const pdfUrl = getSummarySheetUrl(meetingId, itemIds[i].itemId, itemIds[i].publishId);
-                console.log(`Getting background for item ${i+1} (ID: ${itemIds[i].itemId}, PublishID: ${itemIds[i].publishId}): ${pdfUrl}`);
-                const background = await extractBackgroundFromPDF(pdfUrl);
-                backgroundSections[i] = background;
-            } else {
-                console.log(`Missing itemId or publishId for agenda item ${i+1}`);
-                backgroundSections[i] = "No item ID or publish ID available to retrieve background information.";
+        
+        // Now click each agenda item to get detailed information
+        console.log('Clicking each agenda item to get details and supporting documents...');
+        
+        let orderedListItems = [];
+        let supportingDocs = [];
+        
+        for (let i = 0; i < agendaItems.length; i++) {
+            const item = agendaItems[i];
+            
+            try {
+                console.log(`Processing item ${i + 1}/${agendaItems.length}: ${item.fileNumber}`);
+                
+                // Call the loadAgendaItem JavaScript function directly using the extracted ID
+                if (item.agendaItemId) {
+                    await driver.executeScript(`loadAgendaItem(${item.agendaItemId}, false);`);
+                } else {
+                    console.log(`No agendaItemId found for item ${i + 1}, trying direct click`);
+                    // Fallback to direct click if no agendaItemId
+                    await driver.executeScript(`
+                        var element = document.getElementById('${item.id}');
+                        if (element) {
+                            element.click();
+                        }
+                    `);
+                }
+                
+                // Wait for the #itemView section to populate
+                await driver.wait(until.elementLocated(By.css('#itemView')), 10000);
+                
+                // Wait for content to actually load and be specific to this item
+                // We'll look for the specific file number in the content to ensure it's the right item
+                const expectedFileNumber = item.fileNumber.match(/File No\. ([A-Z\d-]+)/);
+                const expectedFileNo = expectedFileNumber ? expectedFileNumber[1] : '';
+                
+                await driver.wait(async () => {
+                    const itemViewHtml = await driver.findElement(By.css('#itemView')).getAttribute('innerHTML');
+                    return itemViewHtml && 
+                           itemViewHtml.trim().length > 100 && 
+                           itemViewHtml.includes('item-view-title-text') &&
+                           (expectedFileNo === '' || itemViewHtml.includes(expectedFileNo));
+                }, 15000);
+                
+                // Get the populated content
+                const itemViewHtml = await driver.findElement(By.css('#itemView')).getAttribute('innerHTML');
+                const $itemView = cheerio.load(itemViewHtml);
+                
+                // Extract the full description
+                const fullDescription = $itemView('.item-view-title-text').text().trim();
+                const finalItemText = fullDescription || item.fileNumber;
+                
+                orderedListItems.push(finalItemText);
+                
+                // Extract supporting document links
+                const docLinks = [];
+                $itemView('a[href*="DownloadFile"]').each((j, docLink) => {
+                    const $docLink = $itemView(docLink);
+                    const href = $docLink.attr('href');
+                    const title = $docLink.attr('title') || '';
+                    const text = $docLink.text().trim();
+                    if (href) {
+                        docLinks.push({ href, title, text });
+                    }
+                });
+                supportingDocs.push(docLinks);
+                
+            } catch (err) {
+                console.error(`Error extracting Item Details for agenda item ${i+1}:`, err.message);
+                orderedListItems.push(item.fileNumber);
+                supportingDocs.push([]);
             }
         }
-
-        // Generate WordPress file from the raw orderedListItems before any processing
-        generateWordPressOutput(orderedListItems, meetingId, url, backgroundSections);
-
-        // After extracting and cleaning the content
+        // --- Output logic: append supporting docs if found ---
         let markdownContent = orderedListItems.map((item, index) => {
-            // Clean up legalese text
             let cleanedItem = cleanAgendaContent(item);
-
-            // Add background section if available
-            if (backgroundSections[index]) {
-                cleanedItem += `\n\n**Background:** ${backgroundSections[index]}`;
+            // Add supporting docs as links
+            if (supportingDocs[index] && supportingDocs[index].length) {
+                cleanedItem += '\n\nSupporting documents:';
+                supportingDocs[index].forEach(doc => {
+                    cleanedItem += `\n- [${doc.text || doc.title || 'Document'}](${doc.href.startsWith('http') ? doc.href : 'https://tampagov.hylandcloud.com' + doc.href.replace(/&amp;/g, '&')})`;
+                });
             }
-
-            // Ensure no duplicate numbering
             if (/^\d+\./.test(cleanedItem)) {
-                return cleanedItem; // Item already starts with a number
+                return cleanedItem;
             }
-
-            // Format as a proper markdown list item with index+1 as the number
             return `${index + 1}. ${cleanedItem}`;
-        }).join('\n\n'); // Double line break for cleaner WordPress import
+        }).join('\n\n');
 
         // Extract file numbers and their list numbers
         const fileNumberMatches = markdownContent.match(/\d+\.\s+\*\*File No\. ([A-Z\/]+(?:[12])?-\d+-\d+(?:-[A-Z])?)\*\*/g) || [];
@@ -434,14 +324,36 @@ async function scrapeMeetingIds(url) {
         // Load the page source into cheerio
         const $ = cheerio.load(pageSource);
         
-        // Find all unique data-meeting-id attributes for <tr> where the last <td> includes an href
+        // Find all unique data-meeting-id attributes for <tr> where the last <td> includes an "Agenda" href (not "Summary")
         let meetingIds = new Set();
         $('#meetings-list-upcoming table:first-of-type tr').each((i, tr) => {
             let lastTd = $(tr).find('td').last();
-            if (lastTd.find('a[href]').length > 0) {
+            let links = lastTd.find('a[href]');
+            
+            // Check if any link in this row contains "Agenda" and NOT "Summary"
+            let hasAgendaLink = false;
+            links.each((j, link) => {
+                let linkText = $(link).text().trim().toLowerCase();
+                let linkHref = $(link).attr('href') || '';
+                
+                // Include if:
+                // 1. Link text contains "agenda" but not "summary"
+                // 2. Link href contains "doctype=1" (which is agenda) but text doesn't contain "summary"
+                if ((linkText.includes('agenda') && !linkText.includes('summary')) ||
+                    (linkHref.includes('doctype=1') && !linkText.includes('summary'))) {
+                    hasAgendaLink = true;
+                }
+            });
+            
+            if (hasAgendaLink) {
                 let meetingId = $(tr).attr('data-meeting-id');
                 if (meetingId) {
-                    meetingIds.add(meetingId);
+                    // Explicitly exclude known summary meeting IDs
+                    if (meetingId === '2651') {
+                        console.log(`Excluding meeting ${meetingId} (appears to be a Summary link)`);
+                    } else {
+                        meetingIds.add(meetingId);
+                    }
                 }
             }
         });
@@ -594,11 +506,20 @@ async function main() {
     
     // Scrape each meeting ID sequentially
     for (let meetingId of uniqueMeetingIds) {
-        let meetingUrl = `https://tampagov.hylandcloud.com/221agendaonline/Documents/ViewAgenda?meetingId=${meetingId}&type=agenda&doctype=1`;
+        // Use the correct rendered agenda URL
+        let meetingUrl = `https://tampagov.hylandcloud.com/221agendaonline/Meetings/ViewMeeting?id=${meetingId}&doctype=1`;
         console.log(`Scraping meeting ID: ${meetingId} with URL: ${meetingUrl}`);
         await scrapeWithSelenium(meetingUrl, meetingId);
     }
 }
 
 // Call the main function
-main();
+if (require.main === module) {
+    main();
+}
+
+// Export functions for testing
+module.exports = {
+    scrapeMeetingIds,
+    scrapeWithSelenium
+};
