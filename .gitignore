@@ -1,2 +1,18 @@
+# OS files
 .DS_Store
-node_modules
+Thumbs.db
+
+# Node modules
+node_modules/
+
+# Debug files
+debug/
+*.log
+
+# IDE files
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
