@@ -2,6 +2,10 @@ const { Builder, By, until } = require('selenium-webdriver');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
+const pdfParse = require('pdf-parse');
+const { generateWordPressOutput, cleanAgendaContent } = require('./wordpress-functions');
+const { toTitleCase } = require('./format-helpers');
 
 function debugCharCodes(str) {
     return Array.from(str).map(char => `${char}: ${char.charCodeAt(0)}`).join('\n');
@@ -41,67 +45,92 @@ function extractDollarAmounts(markdownContent) {
 }
 
 /**
- * Clean up redundant legalese text from agenda items
- * @param {string} content - The raw agenda content
- * @returns {string} - Cleaned agenda content
+ * Extract background from PDF using the browser session
+ * @param {WebDriver} driver - Selenium WebDriver instance
+ * @param {string} pdfRelativeUrl - Relative URL to the PDF
+ * @returns {Promise<string>} - Extracted background text
  */
-function cleanAgendaContent(content) {
-    // First preserve file numbers with proper formatting
-    let cleaned = content
-        // Format file numbers consistently
-        .replace(/(File No\. (DE[12]-\d{2}-\d{2}(?:-[A-Z])?|TA\/CPA\d{2}-\d{2}|REZ-\d{2}-\d{2}|VAC-\d{2}-\d{4}|AB[12]-\d{2}-\d{2}|SU\d?-\d{2}-\d{2}))/gi, '**$1**')
-        
-        // Remove memorandum notes
-        .replace(/\s*Memorandum from [^\.]+?\.[^\.]+?\./gi, '')
-        .replace(/\s*Email from [^\.]+?\.[^\.]+?\./gi, '')
-        
-        // Normalize spacing
-        .replace(/\s+/g, ' ').trim()
-        
-        // Remove parenthetical notes - these don't change meaning
-        .replace(/\(Ordinance being presented[^)]*\)/gi, '')
-        .replace(/\(To be R\/F\)/gi, '')
-        .replace(/\(Updated[^)]*\)/gi, '')
-        .replace(/\(Original [Mm]otion[^)]*\)/gi, '')
-        .replace(/\(Continued from[^)]*\)/gi, '')
-        .replace(/\(Motion to reschedule[^)]*\)/gi, '')
-        .replace(/\(Motion adopting[^)]*\)/gi, '')
-        .replace(/\(Motion requesting[^)]*\)/gi, '')
-        .replace(/\(Amended motion[^)]*\)/gi, '')
-        .replace(/\(Next [^)]*\)/gi, '')
-        .replace(/\(First (discussion|public hearing)[^)]*\)/gi, '')
-        
-        // Remove ONLY standard ending phrases - these are truly boilerplate
-        .replace(/;\s*providing an effective date\.?$/gi, '.')
-        .replace(/;\s*providing for severability\.?$/gi, '.')
-        .replace(/;\s*providing for repeal of all ordinances in conflict\.?$/gi, '.')
-        .replace(/;\s*repealing conflicts\.?$/gi, '.')
-        
-        // Handle all variations of authorization phrases - expanded to catch more patterns
-        .replace(/;\s*authorizing the Director of Purchasing to purchase said property, supplies, materials or services\.?$/gi, '.')
-        .replace(/;\s*authorizing the Mayor(?: of the City of Tampa)? to execute (?:same|said agreement|said Amendment|said Change Order)(?: on behalf of the City of Tampa)?\.?$/gi, '.')
-        .replace(/;\s*authorizing execution(?: thereof)? by the Mayor(?: of the City of Tampa)?(?: and attestation by the (?:City )?Clerk)?\.?$/gi, '.')
-        .replace(/;\s*authorizing the execution thereof by the Mayor(?: of the City of Tampa)?(?: and attestation by the (?:City )?Clerk)?\.?$/gi, '.')
-        .replace(/;\s*authorizing execution by the Mayor and attestation by the City Clerk\.?$/gi, '.')
-        
-        // Fix any punctuation issues
-        .replace(/,\s*;/g, ';')
-        .replace(/,\s*\./g, '.')
-        .replace(/:\s*\./g, '.')
-        .replace(/;\s*\./g, '.')
-        .replace(/\.\s*\.$/g, '.'); // Fix double periods
-        
-    // Ensure ends with period if not already (but check more carefully)
-    if (cleaned && !/[.?!]$/.test(cleaned.trim())) {
-        cleaned += '.';
+function convertToDirectPDFUrl(downloadFileUrl) {
+    // Convert DownloadFile to DownloadFileBytes for direct PDF access
+    if (downloadFileUrl.includes('DownloadFile') && !downloadFileUrl.includes('DownloadFileBytes')) {
+        return downloadFileUrl.replace('DownloadFile', 'DownloadFileBytes');
     }
-    
-    // Final check for double periods
-    cleaned = cleaned
-        .replace(/\.\s*\.$/g, '.')  // Fix double periods at end
-        .replace(/\.\s+\.$/g, '.'); // Fix period-space-period at end
-    
-    return cleaned;
+    return downloadFileUrl;
+}
+
+async function extractBackgroundFromPDFWithBrowser(driver, pdfRelativeUrl) {
+    try {
+        // Convert to direct PDF URL first
+        const directPdfUrl = convertToDirectPDFUrl(pdfRelativeUrl);
+        
+        // Navigate to the PDF URL to trigger download
+        const fullPdfUrl = directPdfUrl.startsWith('http') 
+            ? directPdfUrl 
+            : 'https://tampagov.hylandcloud.com' + directPdfUrl.replace(/&amp;/g, '&');
+            
+        console.log(`Navigating to PDF: ${fullPdfUrl}`);
+        
+        // Get current cookies from the browser
+        const cookies = await driver.manage().getCookies();
+        
+        // Create cookie string for axios
+        const cookieString = cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
+        
+        // Try to download with browser session
+        const response = await axios.get(fullPdfUrl, {
+            responseType: 'arraybuffer',
+            timeout: 30000,
+            headers: {
+                'User-Agent': await driver.executeScript('return navigator.userAgent'),
+                'Cookie': cookieString,
+                'Referer': await driver.getCurrentUrl()
+            }
+        });
+        
+        console.log(`Downloaded ${response.data.length} bytes`);
+        
+        // Check if this is actually a PDF
+        const pdfHeader = Buffer.from(response.data.slice(0, 10)).toString('ascii');
+        if (!pdfHeader.startsWith('%PDF')) {
+            console.log(`Warning: Not a PDF. Header: ${pdfHeader}`);
+            return '';
+        }
+        
+        // Parse the PDF
+        const pdfData = await pdfParse(response.data);
+        const text = pdfData.text;
+        
+        console.log(`Extracted ${text.length} characters from PDF`);
+        
+        // Look for background section
+        const backgroundPatterns = [
+            /background\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|\n\s*\n|$))/i,
+            /background\s*information\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|\n\s*\n|$))/i,
+            /project\s*background\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|\n\s*\n|$))/i
+        ];
+        
+        for (const pattern of backgroundPatterns) {
+            const match = text.match(pattern);
+            if (match && match[1]) {
+                let background = match[1].trim()
+                    .replace(/\s+/g, ' ')
+                    .replace(/[\f\r]/g, '')
+                    .trim();
+                
+                if (background.length > 20) {
+                    console.log(`Found background (${background.length} chars): ${background.substring(0, 100)}...`);
+                    return background;
+                }
+            }
+        }
+        
+        console.log('No background section found');
+        return '';
+        
+    } catch (error) {
+        console.error(`Error extracting background: ${error.message}`);
+        return '';
+    }
 }
 
 /**
@@ -222,31 +251,76 @@ async function scrapeWithSelenium(url, meetingId) {
                 
                 // Extract supporting document links
                 const docLinks = [];
+                let summarySheetLink = null;
+                
                 $itemView('a[href*="DownloadFile"]').each((j, docLink) => {
                     const $docLink = $itemView(docLink);
                     const href = $docLink.attr('href');
                     const title = $docLink.attr('title') || '';
                     const text = $docLink.text().trim();
                     if (href) {
-                        docLinks.push({ href, title, text });
+                        // Convert to direct download URL for PDFs
+                        const directHref = convertToDirectPDFUrl(href);
+                        const docInfo = { href: directHref, title, text, originalHref: href };
+                        docLinks.push(docInfo);
+                        
+                        // Track Summary Sheet for background extraction
+                        if (text.toLowerCase().includes('summary sheet') && 
+                            text.toLowerCase().includes('cover sheet')) {
+                            summarySheetLink = docInfo;
+                        }
                     }
                 });
                 supportingDocs.push(docLinks);
+                
+                // Try to extract background from Summary Sheet PDF if available
+                let backgroundText = '';
+                if (summarySheetLink) {
+                    try {
+                        console.log(`Attempting to extract background from: ${summarySheetLink.text}`);
+                        console.log(`PDF URL: ${summarySheetLink.href}`);
+                        backgroundText = await extractBackgroundFromPDFWithBrowser(driver, summarySheetLink.href);
+                        console.log(`Background extraction result: ${backgroundText.length} characters`);
+                        if (backgroundText.length > 0) {
+                            console.log(`Background preview: ${backgroundText.substring(0, 100)}...`);
+                        }
+                    } catch (err) {
+                        console.log(`Could not extract background: ${err.message}`);
+                    }
+                } else {
+                    console.log('No Summary Sheet found for background extraction');
+                }
+                
+                // Store background text for later use
+                if (!global.agendaBackgrounds) global.agendaBackgrounds = [];
+                global.agendaBackgrounds.push(backgroundText);
+                console.log(`Stored background for item ${i + 1}: ${backgroundText.length} chars`);
                 
             } catch (err) {
                 console.error(`Error extracting Item Details for agenda item ${i+1}:`, err.message);
                 orderedListItems.push(item.fileNumber);
                 supportingDocs.push([]);
+                
+                // Store empty background text for consistency
+                if (!global.agendaBackgrounds) global.agendaBackgrounds = [];
+                global.agendaBackgrounds.push('');
             }
         }
         // --- Output logic: append supporting docs if found ---
         let markdownContent = orderedListItems.map((item, index) => {
             let cleanedItem = cleanAgendaContent(item);
+            
+            // Add background section if available
+            if (global.agendaBackgrounds && global.agendaBackgrounds[index] && global.agendaBackgrounds[index].trim()) {
+                cleanedItem += `\n\n**Background:**\n${global.agendaBackgrounds[index].trim()}`;
+            }
+            
             // Add supporting docs as links
             if (supportingDocs[index] && supportingDocs[index].length) {
                 cleanedItem += '\n\nSupporting documents:';
                 supportingDocs[index].forEach(doc => {
-                    cleanedItem += `\n- [${doc.text || doc.title || 'Document'}](${doc.href.startsWith('http') ? doc.href : 'https://tampagov.hylandcloud.com' + doc.href.replace(/&amp;/g, '&')})`;
+                    const docTitle = toTitleCase(doc.text || doc.title || 'Document');
+                    cleanedItem += `\n- [${docTitle}](${doc.href.startsWith('http') ? doc.href : 'https://tampagov.hylandcloud.com' + doc.href.replace(/&amp;/g, '&')})`;
                 });
             }
             if (/^\d+\./.test(cleanedItem)) {
@@ -281,6 +355,15 @@ async function scrapeWithSelenium(url, meetingId) {
 
         // Add source URL at the bottom
         markdownContent += '\n\n---\n*Source: [Original Agenda Document](' + url + ')*';
+
+        // Generate WordPress output with background sections if available
+        const backgrounds = global.agendaBackgrounds || [];
+        if (backgrounds.length > 0) {
+            console.log(`Generating WordPress output with ${backgrounds.filter(bg => bg.length > 0).length} background sections`);
+            generateWordPressOutput(orderedListItems, supportingDocs, meetingId, url, backgrounds);
+        } else {
+            generateWordPressOutput(orderedListItems, supportingDocs, meetingId, url);
+        }
 
         // Only write file if content exists
         if (markdownContent.trim()) {
@@ -369,134 +452,6 @@ async function scrapeMeetingIds(url) {
     }
 }
 
-function generateWordPressOutput(orderedListItems, meetingId, sourceUrl, backgroundSections = []) {
-  // Transform the URL to the correct format
-  const correctedUrl = sourceUrl
-    .replace('/Documents/ViewAgenda', '/Meetings/ViewMeeting')
-    .replace('meetingId=', 'id=')
-    .replace('&type=agenda', '');
-  
-  // Generate the intro blocks with the corrected URL
-  let wpHtml = `<!-- wp:paragraph -->
-<p>This version of the agenda is meant to be an easier way to skim the items before diving into the full draft and back up items. It also is meant as an archive for search. Often I remember something being on the agenda but not sure when. While the ongoing work with Onbase continues, and there is some search functionality here I can cross reference with agenda previews, then look at the original agenda.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->
-<div class="wp-block-group"><!-- wp:coblocks/icon {"icon":"page","href":"${correctedUrl}"} /-->
-
-<!-- wp:paragraph {"fontSize":"large"} -->
-<p class="has-large-font-size"><a href="${correctedUrl}">Draft Agenda</a></p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->\n\n`;
-  
-  // Process items to identify where the split should occur
-  const processedItems = [];
-  let firstStrongIndex = -1;
-  
-  // Extract file numbers for the map
-  const fileNumberMatches = [];
-  
-  // Process each item and track the first occurrence of <strong>
-  orderedListItems.forEach((item, index) => {
-    let cleanedText = cleanAgendaContent(item);
-    
-    let itemNumber = index + 1;
-    let numberMatch = cleanedText.match(/^(\d+)\./);
-    if (numberMatch) {
-      itemNumber = numberMatch[1];
-      cleanedText = cleanedText.replace(/^\d+\./, '').trim();
-    }
-    
-    // Add background section if available
-    if (backgroundSections[index]) {
-      cleanedText += `\n\n<p class="has-background has-pale-pink-background-color"><strong>Background:</strong> ${backgroundSections[index]}</p>`;
-    }
-    
-    // Check if this item will have a strong tag after conversion
-    const hasStrongTag = /\*\*File No\. (DE[12]|TA\/CPA|REZ|VAC|AB[12]|SU\d?)/i.test(cleanedText);
-    
-    // If this has a strong tag, extract the file number and list number for the map
-    if (hasStrongTag) {
-      const fileNoMatch = cleanedText.match(/\*\*File No\. ([A-Z\/\d-]+)\*\*/);
-      if (fileNoMatch) {
-        const fileNo = fileNoMatch[1];
-        // Split on last dash and pad number with zeros
-        const [prefix, num] = fileNo.split(/-(?=[^-]+$)/);
-        const paddedNum = num.padStart(7, '0');
-        const paddedFileNo = `${prefix}-${paddedNum}`;
-        fileNumberMatches.push(`${paddedFileNo}:${itemNumber}`);
-      }
-    }
-    
-    // Convert markdown bold syntax to HTML strong tags
-    cleanedText = cleanedText.replace(/\*\*(File No\. (DE[12]-\d{2}-\d{2}(?:-[A-Z])?|TA\/CPA\d{2}-\d{2}|REZ-\d{2}-\d{2}|VAC-\d{2}-\d{4}|AB[12]-\d{2}-\d{2}|SU\d?-\d{2}-\d{2}))\*\*/gi, '<strong>$1</strong>');
-    
-    // Store the processed item
-    processedItems.push({ itemNumber, cleanedText, hasStrongTag });
-    
-    // Track the first occurrence of a strong tag
-    if (hasStrongTag && firstStrongIndex === -1) {
-      firstStrongIndex = processedItems.length - 1;
-    }
-  });
-  
-  // If we found a strong tag, split the list
-  if (firstStrongIndex !== -1) {
-    // First part of the list - using WordPress block format
-    wpHtml += `<!-- wp:list {"ordered":true} -->\n<ol class="wp-block-list">\n`;
-    for (let i = 0; i < firstStrongIndex; i++) {
-      const { cleanedText } = processedItems[i];
-      wpHtml += `<!-- wp:list-item -->\n<li>${cleanedText}</li>\n<!-- /wp:list-item -->\n`;
-    }
-    wpHtml += `</ol>\n<!-- /wp:list -->\n\n`;
-    
-    // Add heading for Public Hearings & Ordinances
-    wpHtml += `<!-- wp:heading {"level":3} -->\n<h3>Public Hearings & Ordinances</h3>\n<!-- /wp:heading -->\n\n`;
-    
-    // Add the map block using the extracted file numbers
-    if (fileNumberMatches.length > 0) {
-      const recordsStr = fileNumberMatches.join(', ');
-      wpHtml += `<!-- wp:map-current-dev/block {"apiToken":"pk.eyJ1IjoibWlrbGIiLCJhIjoiY2x6OThxcWlwMDB2ajJrcTR3dGJkNjBpOCJ9.x64atltv8LBQAjtuGTUvrA","records":"${recordsStr}"} -->
-<div class="wp-block-map-current-dev-block mapbox-block" data-token="pk.eyJ1IjoibWlrbGIiLCJhIjoiY2x6OThxcWlwMDB2ajJrcTR3dGJkNjBpOCJ9.x64atltv8LBQAjtuGTUvrA" data-center="[-82.4572,27.9506]" data-zoom="11" data-geojson-endpoint="https://arcgis.tampagov.net/arcgis/rest/services/OpenData/Planning/MapServer/31/query?outFields=*&amp;where=1%3D1&amp;f=geojson" data-records="${recordsStr}" data-show-geocoder="true" data-geocoder-position="top-right" data-show-legend="true" data-legend-position="bottom-left"></div>
-<!-- /wp:map-current-dev/block -->\n\n`;
-    }
-    
-    // Add Tampa zoning map reference block
-    wpHtml += `<!-- wp:paragraph -->
-<p>If you've missed it, I have a map for city of Tampa current zoning and Future Land Use designations.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://tampamonitor.com/tampa-land-use-map/">City of Tampa Zoning Map</a></div>
-<!-- /wp:button --></div>
-<!-- /wp:buttons -->\n\n`;
-    
-    // Second part of the list using WordPress block format with start attribute
-    const startNumber = processedItems[firstStrongIndex].itemNumber;
-    wpHtml += `<!-- wp:list {"ordered":true,"start":${startNumber}} -->\n<ol start="${startNumber}" class="wp-block-list">\n`;
-    for (let i = firstStrongIndex; i < processedItems.length; i++) {
-      const { cleanedText } = processedItems[i];
-      wpHtml += `<!-- wp:list-item -->\n<li>${cleanedText}</li>\n<!-- /wp:list-item -->\n`;
-    }
-    wpHtml += `</ol>\n<!-- /wp:list -->\n`;
-  } else {
-    // Single list - WordPress block format
-    wpHtml += `<!-- wp:list {"ordered":true} -->\n<ol class="wp-block-list">\n`;
-    processedItems.forEach(({ cleanedText }) => {
-      wpHtml += `<!-- wp:list-item -->\n<li>${cleanedText}</li>\n<!-- /wp:list-item -->\n`;
-    });
-    wpHtml += `</ol>\n<!-- /wp:list -->\n`;
-  }
-  
-  // Write the WordPress HTML file
-  const outputDir = path.join(__dirname, 'agendas');
-  let outputFileName = path.join(outputDir, `agenda_${meetingId}.wp.html`);
-  fs.writeFileSync(outputFileName, wpHtml);
-  
-  console.log(`Successfully created WordPress-compatible file: ${outputFileName}`);
-}
-
 async function main() {
     // URL of the page to scrape for meeting IDs
     let url = 'https://tampagov.hylandcloud.com/221agendaonline/';
@@ -521,5 +476,6 @@ if (require.main === module) {
 // Export functions for testing
 module.exports = {
     scrapeMeetingIds,
-    scrapeWithSelenium
+    scrapeWithSelenium,
+    extractBackgroundFromPDFWithBrowser
 };
