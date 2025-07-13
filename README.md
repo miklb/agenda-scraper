@@ -70,11 +70,18 @@ This will:
 - `agenda-scraper.js` - Main scraper script
 - `wordpress-functions.js` - WordPress HTML generation
 - `format-helpers.js` - Text formatting utilities
-- `selenium-background-extractor.js` - PDF background extraction
 - `agenda-styles.css` - Frontend CSS for WordPress
 - `editor-agenda-styles.css` - Editor CSS for WordPress admin
 
 ## Version History
+
+### v1.1.1
+
+- **Production Code Cleanup**: Removed extensive debugging code and console.log statements for cleaner production output
+- **File Organization**: Deleted obsolete utility files (background-extractor.js, parse-meeting.js, parse-pdf.js, selenium-background-extractor.js, single-scraper.js)
+- **Debug Artifact Removal**: Cleaned up debug directory and test files from development sessions
+- **Essential Logging Restoration**: Preserved critical user feedback messages for markdown and WordPress file creation
+- **Maintainability Improvements**: Streamlined codebase for better production readiness and maintenance
 
 ### v1.1.0
 

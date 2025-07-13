@@ -15,9 +15,6 @@ async function scrapeMeetingIds(url) {
         // Extract the page source
         let pageSource = await driver.getPageSource();
         
-        // Log the page source for debugging
-        console.log('Page source:', pageSource);
-        
         // Load the page source into cheerio
         const $ = cheerio.load(pageSource);
         
@@ -29,7 +26,6 @@ async function scrapeMeetingIds(url) {
         
         // Convert the set to an array and log the unique meeting IDs
         let uniqueMeetingIds = Array.from(meetingIds);
-        console.log('Unique meeting IDs:', uniqueMeetingIds);
         
         return uniqueMeetingIds;
     } finally {

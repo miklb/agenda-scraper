@@ -7,10 +7,6 @@ const pdfParse = require('pdf-parse');
 const { generateWordPressOutput, cleanAgendaContent } = require('./wordpress-functions');
 const { toTitleCase } = require('./format-helpers');
 
-function debugCharCodes(str) {
-    return Array.from(str).map(char => `${char}: ${char.charCodeAt(0)}`).join('\n');
-}
-
 /**
  * Extract dollar amounts from agenda items and generate a table
  * @param {string} markdownContent - The markdown content of the agenda
@@ -98,7 +94,6 @@ function formatDateForFilename(dateStr) {
         
         // Validate the date
         if (isNaN(date.getTime())) {
-            console.log(`Could not parse date: ${dateStr}`);
             return '';
         }
         
@@ -109,7 +104,6 @@ function formatDateForFilename(dateStr) {
         
         return `${year}-${month}-${day}`;
     } catch (error) {
-        console.log(`Error formatting date ${dateStr}:`, error.message);
         return '';
     }
 }
@@ -204,8 +198,6 @@ async function extractBackgroundFromPDFWithBrowser(driver, pdfRelativeUrl) {
         const fullPdfUrl = directPdfUrl.startsWith('http') 
             ? directPdfUrl 
             : 'https://tampagov.hylandcloud.com' + directPdfUrl.replace(/&amp;/g, '&');
-            
-        console.log(`Navigating to PDF: ${fullPdfUrl}`);
         
         // Get current cookies from the browser
         const cookies = await driver.manage().getCookies();
@@ -224,20 +216,15 @@ async function extractBackgroundFromPDFWithBrowser(driver, pdfRelativeUrl) {
             }
         });
         
-        console.log(`Downloaded ${response.data.length} bytes`);
-        
         // Check if this is actually a PDF
         const pdfHeader = Buffer.from(response.data.slice(0, 10)).toString('ascii');
         if (!pdfHeader.startsWith('%PDF')) {
-            console.log(`Warning: Not a PDF. Header: ${pdfHeader}`);
             return '';
         }
         
         // Parse the PDF
         const pdfData = await pdfParse(response.data);
         const text = pdfData.text;
-        
-        console.log(`Extracted ${text.length} characters from PDF`);
         
         // Look for background section with improved patterns
         const backgroundPatterns = [
@@ -265,13 +252,11 @@ async function extractBackgroundFromPDFWithBrowser(driver, pdfRelativeUrl) {
                 background = formatBackgroundText(background);
                 
                 if (background.length > 20) {
-                    console.log(`Found background (${background.length} chars): ${background.substring(0, 100)}...`);
                     return background;
                 }
             }
         }
         
-        console.log('No background section found');
         return '';
         
     } catch (error) {
@@ -286,23 +271,13 @@ async function extractBackgroundFromPDFWithBrowser(driver, pdfRelativeUrl) {
 async function scrapeWithSelenium(url, meetingId) {
     let driver = await new Builder().forBrowser('chrome').build();
     try {
-        console.log(`Loading page: ${url}`);
         await driver.get(url);
         
-        // Wait longer for the page to fully load and JavaScript to execute
-        console.log('Waiting for page to fully load...');
+        // Wait for the page to fully load and JavaScript to execute
         await new Promise(res => setTimeout(res, 5000)); // Initial wait
         
         // Get the full page source after JavaScript execution
-        console.log('Getting page source after JavaScript execution...');
         let pageSource = await driver.getPageSource();
-        
-        // Save the full page source for debugging
-        const debugDir = path.join(__dirname, 'debug');
-        if (!fs.existsSync(debugDir)) fs.mkdirSync(debugDir);
-        const debugFile = path.join(debugDir, `meeting_${meetingId}_full_page.html`);
-        fs.writeFileSync(debugFile, pageSource);
-        console.log(`Saved full page HTML to ${debugFile}`);
         
         // Load the page source into cheerio
         const $ = cheerio.load(pageSource);
@@ -322,7 +297,6 @@ async function scrapeWithSelenium(url, meetingId) {
             if (dateElement.length > 0) {
                 meetingDate = dateElement.text().trim();
                 if (meetingDate && meetingDate.length > 5) {
-                    console.log(`Found meeting date with selector '${selector}': ${meetingDate}`);
                     break;
                 }
             }
@@ -334,13 +308,10 @@ async function scrapeWithSelenium(url, meetingId) {
             const dateMatch = pageTitle.match(/(\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2}|[A-Za-z]+ \d{1,2}, \d{4})/);
             if (dateMatch) {
                 meetingDate = dateMatch[1];
-                console.log(`Found meeting date in page title: ${meetingDate}`);
             }
         }
         
         // Look for agenda items with proper File Numbers (using working selector)
-        console.log('Searching for agenda items...');
-        
         let agendaItems = [];
         
         // Look specifically for links with "File No." that are actual agenda items
@@ -363,12 +334,8 @@ async function scrapeWithSelenium(url, meetingId) {
                     href: href,
                     agendaItemId: agendaItemId
                 });
-                
-                console.log(`Found agenda item ${agendaItems.length}: ${text} (ID: ${id}, AgendaItemId: ${agendaItemId})`);
             }
         });
-        
-        console.log(`Found ${agendaItems.length} agenda items with File Numbers`);
         
         if (agendaItems.length === 0) {
             console.error(`No agenda item links found for meeting ${meetingId}`);
@@ -376,7 +343,6 @@ async function scrapeWithSelenium(url, meetingId) {
         }
         
         // Now click each agenda item to get detailed information
-        console.log('Clicking each agenda item to get details and supporting documents...');
         
         let orderedListItems = [];
         let supportingDocs = [];
@@ -385,13 +351,11 @@ async function scrapeWithSelenium(url, meetingId) {
             const item = agendaItems[i];
             
             try {
-                console.log(`Processing item ${i + 1}/${agendaItems.length}: ${item.fileNumber}`);
                 
                 // Call the loadAgendaItem JavaScript function directly using the extracted ID
                 if (item.agendaItemId) {
                     await driver.executeScript(`loadAgendaItem(${item.agendaItemId}, false);`);
                 } else {
-                    console.log(`No agendaItemId found for item ${i + 1}, trying direct click`);
                     // Fallback to direct click if no agendaItemId
                     await driver.executeScript(`
                         var element = document.getElementById('${item.id}');
@@ -455,29 +419,15 @@ async function scrapeWithSelenium(url, meetingId) {
                 let backgroundText = '';
                 if (summarySheetLink) {
                     try {
-                        console.log(`Attempting to extract background from: ${summarySheetLink.text}`);
-                        console.log(`PDF URL: ${summarySheetLink.href}`);
                         backgroundText = await extractBackgroundFromPDFWithBrowser(driver, summarySheetLink.href);
-                        console.log(`Background extraction result: ${backgroundText.length} characters`);
-                        if (backgroundText.length > 0) {
-                            console.log(`Background preview: ${backgroundText.substring(0, 200)}...`);
-                            // Save raw background text for debugging
-                            const debugDir = path.join(__dirname, 'debug');
-                            const debugBackgroundFile = path.join(debugDir, `item_${i + 1}_background.txt`);
-                            fs.writeFileSync(debugBackgroundFile, backgroundText);
-                            console.log(`Saved background text to ${debugBackgroundFile}`);
-                        }
                     } catch (err) {
                         console.log(`Could not extract background: ${err.message}`);
                     }
-                } else {
-                    console.log('No Summary Sheet found for background extraction');
                 }
                 
                 // Store background text for later use
                 if (!global.agendaBackgrounds) global.agendaBackgrounds = [];
                 global.agendaBackgrounds.push(backgroundText);
-                console.log(`Stored background for item ${i + 1}: ${backgroundText.length} chars`);
                 
             } catch (err) {
                 console.error(`Error extracting Item Details for agenda item ${i+1}:`, err.message);
@@ -491,7 +441,6 @@ async function scrapeWithSelenium(url, meetingId) {
         }
         
         // Extract meeting date from the first summary sheet PDF
-        console.log('Extracting meeting date from summary sheet...');
         const meetingDateStr = await extractMeetingDateFromFirstPDF(supportingDocs);
         
         // --- Output logic: append supporting docs if found ---
@@ -554,7 +503,6 @@ async function scrapeWithSelenium(url, meetingId) {
         // Generate WordPress output with background sections if available
         const backgrounds = global.agendaBackgrounds || [];
         if (backgrounds.length > 0) {
-            console.log(`Generating WordPress output with ${backgrounds.filter(bg => bg.length > 0).length} background sections`);
             generateWordPressOutput(orderedListItems, supportingDocs, meetingId, url, backgrounds);
         } else {
             generateWordPressOutput(orderedListItems, supportingDocs, meetingId, url);
@@ -638,7 +586,7 @@ async function scrapeMeetingIds(url) {
                 if (meetingId) {
                     // Explicitly exclude known summary meeting IDs
                     if (meetingId === '2651') {
-                        console.log(`Excluding meeting ${meetingId} (appears to be a Summary link)`);
+                        // Skip summary meetings
                     } else {
                         meetingIds.add(meetingId);
                     }
@@ -646,9 +594,8 @@ async function scrapeMeetingIds(url) {
             }
         });
         
-        // Convert the set to an array and log the unique meeting IDs
+        // Convert the set to an array
         let uniqueMeetingIds = Array.from(meetingIds);
-        console.log('Unique meeting IDs:', uniqueMeetingIds);
         
         return uniqueMeetingIds;
     } finally {
@@ -665,7 +612,6 @@ async function main() {
     if (specificMeetingId) {
         // Process single meeting
         const meetingUrl = `https://tampagov.hylandcloud.com/221agendaonline/Meetings/ViewMeeting?id=${specificMeetingId}&doctype=1`;
-        console.log(`Scraping single meeting ID: ${specificMeetingId} with URL: ${meetingUrl}`);
         await scrapeWithSelenium(meetingUrl, specificMeetingId);
         return;
     }
@@ -680,7 +626,6 @@ async function main() {
     for (let meetingId of uniqueMeetingIds) {
         // Use the correct rendered agenda URL
         let meetingUrl = `https://tampagov.hylandcloud.com/221agendaonline/Meetings/ViewMeeting?id=${meetingId}&doctype=1`;
-        console.log(`Scraping meeting ID: ${meetingId} with URL: ${meetingUrl}`);
         await scrapeWithSelenium(meetingUrl, meetingId);
     }
 }
@@ -714,8 +659,6 @@ async function extractMeetingDateFromFirstPDF(supportingDocs) {
                     if (doc.text && doc.text.toLowerCase().includes('summary sheet') && 
                         doc.href && doc.href.includes('.pdf')) {
                         
-                        console.log(`Extracting meeting date from: ${doc.text}`);
-                        
                         // Download and parse the PDF
                         const pdfUrl = doc.href.startsWith('http') ? 
                             doc.href : 
@@ -727,14 +670,12 @@ async function extractMeetingDateFromFirstPDF(supportingDocs) {
                         // Look for "Requested Meeting Date:" pattern
                         const dateMatch = pdfData.text.match(/Requested Meeting Date:\s*(\d{1,2}\/\d{1,2}\/\d{4})/i);
                         if (dateMatch) {
-                            console.log(`Found meeting date: ${dateMatch[1]}`);
                             return dateMatch[1];
                         }
                         
                         // Alternative patterns if the main one doesn't work
                         const altDateMatch = pdfData.text.match(/Meeting Date:\s*(\d{1,2}\/\d{1,2}\/\d{4})/i);
                         if (altDateMatch) {
-                            console.log(`Found alternative meeting date: ${altDateMatch[1]}`);
                             return altDateMatch[1];
                         }
                     }
@@ -742,7 +683,6 @@ async function extractMeetingDateFromFirstPDF(supportingDocs) {
             }
         }
         
-        console.log('No meeting date found in summary sheet PDFs');
         return '';
         
     } catch (error) {
@@ -772,7 +712,6 @@ function formatDateForDisplay(dateStr) {
         
         return date.toLocaleDateString('en-US', options);
     } catch (error) {
-        console.log(`Error formatting date ${dateStr}:`, error.message);
         return dateStr; // Return original if formatting fails
     }
 }
