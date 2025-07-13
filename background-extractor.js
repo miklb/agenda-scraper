@@ -46,9 +46,15 @@ async function extractBackgroundFromPDF(pdfUrl) {
         
         // Look for background section in various formats
         const backgroundPatterns = [
-            /background\s*:?\s*([\s\S]*?)(?=\n\s*(?:recommendation|analysis|staff|attachments?|fiscal|budget|legal|conclusion|\n\s*\n|$))/i,
-            /background\s*information\s*:?\s*([\s\S]*?)(?=\n\s*(?:recommendation|analysis|staff|attachments?|fiscal|budget|legal|conclusion|\n\s*\n|$))/i,
-            /project\s*background\s*:?\s*([\s\S]*?)(?=\n\s*(?:recommendation|analysis|staff|attachments?|fiscal|budget|legal|conclusion|\n\s*\n|$))/i,
+            // Main background pattern - captures until common section headers
+            /background\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff\s+recommendation|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|contact|prepared\s+by|reviewed\s+by|\n\s*\n|$))/i,
+            // Specific BACKGROUND: to FISCAL IMPACT: pattern  
+            /BACKGROUND\s*:\s*([\s\S]*?)(?=\s*FISCAL\s+IMPACT\s*:)/i,
+            // Background information variant
+            /background\s*information\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff\s+recommendation|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|contact|prepared\s+by|reviewed\s+by|\n\s*\n|$))/i,
+            // Project background variant
+            /project\s*background\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff\s+recommendation|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|contact|prepared\s+by|reviewed\s+by|\n\s*\n|$))/i,
+            // Legacy patterns for backward compatibility
             /summary\s*:?\s*([\s\S]*?)(?=\n\s*(?:recommendation|analysis|staff|attachments?|fiscal|budget|legal|conclusion|\n\s*\n|$))/i
         ];
         

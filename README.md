@@ -6,12 +6,13 @@ A Node.js application that scrapes Tampa City Council agendas and generates clea
 
 - **Clean Agenda Items**: Removes legal boilerplate text while preserving essential information
 - **Supporting Documents**: Extracts and displays links to all supporting documents with direct PDF URLs
-- **Background Information**: Automatically extracts "Background" sections from Summary Sheet PDFs
+- **Background Information**: Automatically extracts "Background" sections from Summary Sheet PDFs with proper formatting
+- **Robust PDF Parsing**: Structure-based text formatting that preserves numbered lists and paragraph breaks
+- **Meeting Date Extraction**: Automatically extracts meeting dates from PDFs for filename and heading generation
+- **Dollar Amount Tables**: Generates summary tables with all financial amounts from agenda items
 - **Dual Output**: Generates both markdown (.md) and WordPress HTML (.wp.html) files
 - **WordPress Integration**: Uses proper WordPress block markup with collapsible details sections
-- **Zoning Map**: Includes interactive map showing current development applications
 - **Title Case Formatting**: Automatically formats document link text to proper title case
-- **Theme Integration**: CSS styled to match WordPress theme variables
 
 ## Output Examples
 
@@ -74,6 +75,14 @@ This will:
 - `editor-agenda-styles.css` - Editor CSS for WordPress admin
 
 ## Version History
+
+### v1.1.0
+
+- **Fixed PDF Background Formatting**: Implemented robust structure-based PDF text formatting that properly preserves numbered lists and paragraph breaks (closes #1)
+- **Enhanced Meeting Date Extraction**: Improved date parsing from Summary Sheet PDFs with better error handling
+- **Dollar Amount Preservation**: Fixed regex patterns to prevent corruption of monetary values during text processing
+- **Structural Text Processing**: Replaced brittle word-based pattern matching with structure-based approach that trusts PDF parser output
+- **Multi-Paragraph Support**: Correctly handles multiple paragraph breaks in background sections
 
 ### v1.0.0
 

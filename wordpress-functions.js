@@ -72,6 +72,47 @@ function toTitleCase(text) {
 /**
  * Clean up redundant legalese text from agenda items
  */
+/**
+ * Format background text for WordPress with proper block structure
+ * @param {string} backgroundText - The background text to format
+ * @returns {string} - WordPress-formatted background content
+ */
+function formatBackgroundForWordPress(backgroundText) {
+    if (!backgroundText || backgroundText.trim().length === 0) {
+        return '';
+    }
+    
+    // Split by double line breaks (which should separate numbered items after our formatting)
+    const sections = backgroundText.split(/\n\s*\n/).filter(section => section.trim().length > 0);
+    
+    let formattedContent = '';
+    
+    sections.forEach(section => {
+        const trimmedSection = section.trim();
+        
+        // Check if this looks like a numbered item
+        if (trimmedSection.match(/^\d+\.\s/)) {
+            formattedContent += `\n<!-- wp:paragraph -->
+<p><strong>${trimmedSection}</strong></p>
+<!-- /wp:paragraph -->`;
+        } else {
+            // Regular paragraph
+            formattedContent += `\n<!-- wp:paragraph -->
+<p>${trimmedSection}</p>
+<!-- /wp:paragraph -->`;
+        }
+    });
+    
+    // If no structured content was found, treat as single paragraph
+    if (formattedContent.trim().length === 0) {
+        formattedContent = `\n<!-- wp:paragraph -->
+<p>${backgroundText.replace(/\n/g, ' ').trim()}</p>
+<!-- /wp:paragraph -->`;
+    }
+    
+    return formattedContent;
+}
+
 function cleanAgendaContent(content) {
     // First preserve file numbers with proper formatting
     let cleaned = content
@@ -171,10 +212,9 @@ function generateWordPressOutput(orderedListItems, supportingDocs, meetingId, so
     
     // Add background section if available
     if (backgroundSections[index] && backgroundSections[index].trim().length > 0) {
+      const formattedBackground = formatBackgroundForWordPress(backgroundSections[index].trim());
       cleanedText += `\n\n<!-- wp:details -->
-<details class="wp-block-details"><summary>Background</summary><!-- wp:paragraph {"placeholder":"Type / to add a hidden block"} -->
-<p>${backgroundSections[index].trim()}</p>
-<!-- /wp:paragraph --></details>
+<details class="wp-block-details"><summary>Background</summary>${formattedBackground}</details>
 <!-- /wp:details -->`;
     }
     

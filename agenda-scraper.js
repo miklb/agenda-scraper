@@ -21,13 +21,38 @@ function extractDollarAmounts(markdownContent) {
     const dollarRegex = /\$\d{1,3}(?:,\d{3})*(?:\.\d{2})?/g; // Matches dollar amounts like $208,788.00
     const tableRows = [];
     let totalAmount = 0;
+    let inBackgroundSection = false;
 
     lines.forEach((line, index) => {
-        const agendaNumberMatch = line.match(/^\d+\./); // Matches agenda numbers like "1."
-        const dollarMatches = line.match(dollarRegex); // Find all dollar amounts in the line
+        // Check if we're entering a Background section
+        if (line.trim().startsWith('**Background:**')) {
+            inBackgroundSection = true;
+            return;
+        }
+        
+        // Check if we're exiting the Background section (next main agenda item)
+        // Main agenda items start with number followed by period and "File No."
+        if (inBackgroundSection && line.match(/^\d+\.\s+(?:\*\*)?File No\./)) {
+            inBackgroundSection = false;
+        }
+        
+        // Also exit background section when we hit Supporting documents
+        if (inBackgroundSection && line.trim().startsWith('Supporting documents:')) {
+            inBackgroundSection = false;
+            return; // Don't process this line
+        }
+        
+        // Skip lines that are within Background sections
+        if (inBackgroundSection) {
+            return;
+        }
+
+        // Only process main agenda items (lines that start with number and contain "File No.")
+        const agendaNumberMatch = line.match(/^(\d+)\.\s+(?:\*\*)?File No\./);
+        const dollarMatches = line.match(dollarRegex);
 
         if (agendaNumberMatch && dollarMatches) {
-            const agendaNumber = agendaNumberMatch[0].replace('.', ''); // Extract agenda number
+            const agendaNumber = agendaNumberMatch[1]; // Extract agenda number
             dollarMatches.forEach(amount => {
                 const numericValue = parseFloat(amount.replace(/[$,]/g, '')); // Convert to a number
                 totalAmount += numericValue; // Add to the total
@@ -42,6 +67,118 @@ function extractDollarAmounts(markdownContent) {
     table += `\n| **Total** | **$${totalAmount.toLocaleString()}** |`;
 
     return table;
+}
+
+/**
+ * Format a date string for use in filenames (converts to YYYY-MM-DD format)
+ * @param {string} dateStr - Date string in various formats
+ * @returns {string} - Formatted date string or empty string if invalid
+ */
+function formatDateForFilename(dateStr) {
+    if (!dateStr) return '';
+    
+    try {
+        // Handle common date formats
+        let date;
+        
+        // Try parsing MM/DD/YYYY format
+        const mmddyyyy = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+        if (mmddyyyy) {
+            const [, month, day, year] = mmddyyyy;
+            date = new Date(year, month - 1, day);
+        }
+        // Try parsing YYYY-MM-DD format
+        else if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            date = new Date(dateStr);
+        }
+        // Try parsing "Month DD, YYYY" format
+        else {
+            date = new Date(dateStr);
+        }
+        
+        // Validate the date
+        if (isNaN(date.getTime())) {
+            console.log(`Could not parse date: ${dateStr}`);
+            return '';
+        }
+        
+        // Format as YYYY-MM-DD
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        
+        return `${year}-${month}-${day}`;
+    } catch (error) {
+        console.log(`Error formatting date ${dateStr}:`, error.message);
+        return '';
+    }
+}
+
+/**
+ * Format background text to properly structure numbered lists and improve readability
+ * @param {string} text - Raw background text from PDF
+ * @returns {string} - Formatted background text
+ */
+function formatBackgroundText(text) {
+    if (!text || text.trim().length === 0) return text;
+    
+    // Structure-based PDF formatting - trust the PDF parser's output
+    // Only clean up obvious PDF artifacts that don't affect structure
+    let cleanText = text
+        // Fix split dollar amounts like "$452,\n962.55" -> "$452,962.55"  
+        .replace(/\$(\d{1,3}(?:,\d{3})*),\s*\n\s*(\d{3}(?:\.\d{2})?)/g, '$$$1,$2')
+        // Fix split document references like "R\n1182" -> "R1182"
+        .replace(/\b(Resolution|Contract|Case|File|R)\s*\n\s*(\d+)/gi, '$1$2')
+        // Fix split contract numbers, case numbers, etc.
+        .replace(/(\b(?:Contract|Resolution|Case|File|No\.?|Number))\s*\n\s*([A-Z0-9-]+)/gi, '$1 $2')
+        // Fix split dates like "01/05/\n2024" -> "01/05/2024"
+        .replace(/(\d{1,2}\/\d{1,2}\/)\s*\n\s*(\d{4})/g, '$1$2')
+        .trim();
+    
+    // Use the PDF's natural structure: split on lines and analyze the structure
+    const lines = cleanText.split('\n');
+    const processedLines = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        
+        // Check if this line starts a numbered item
+        if (/^\d+\.\s+/.test(line)) {
+            // This is a numbered item - add with separation
+            if (processedLines.length > 0) {
+                processedLines.push(''); // Add separation before new numbered item
+            }
+            processedLines.push(line);
+        } else {
+            // This is a continuation line
+            // Check if the previous line ended with a sentence-ending punctuation
+            const lastLine = processedLines[processedLines.length - 1];
+            
+            if (lastLine && (lastLine.endsWith('.') || lastLine.endsWith('!') || lastLine.endsWith('?'))) {
+                // Previous line ended with sentence-ending punctuation
+                // This suggests a natural paragraph break in the PDF
+                processedLines.push(''); // Add separation
+                processedLines.push(line);
+            } else {
+                // This is a continuation of the previous line
+                if (processedLines.length > 0) {
+                    processedLines[processedLines.length - 1] += ' ' + line;
+                } else {
+                    processedLines.push(line);
+                }
+            }
+        }
+    }
+    
+    // Join with double newlines and clean up
+    const result = processedLines
+        .filter(line => line !== undefined && line !== null)
+        .join('\n\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+        
+    return result;
 }
 
 /**
@@ -102,20 +239,30 @@ async function extractBackgroundFromPDFWithBrowser(driver, pdfRelativeUrl) {
         
         console.log(`Extracted ${text.length} characters from PDF`);
         
-        // Look for background section
+        // Look for background section with improved patterns
         const backgroundPatterns = [
-            /background\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|\n\s*\n|$))/i,
-            /background\s*information\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|\n\s*\n|$))/i,
-            /project\s*background\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|\n\s*\n|$))/i
+            // Main background pattern - captures until common section headers
+            /background\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff\s+recommendation|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|contact|prepared\s+by|reviewed\s+by|\n\s*\n|$))/i,
+            // Background information variant
+            /background\s*information\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff\s+recommendation|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|contact|prepared\s+by|reviewed\s+by|\n\s*\n|$))/i,
+            // Project background variant
+            /project\s*background\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff\s+recommendation|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|contact|prepared\s+by|reviewed\s+by|\n\s*\n|$))/i,
+            // Business case variant
+            /business\s*case\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff\s+recommendation|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|contact|prepared\s+by|reviewed\s+by|\n\s*\n|$))/i,
+            // Fallback: capture large text blocks that might be background
+            /^([\s\S]{200,}?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff\s+recommendation|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|contact|prepared\s+by|reviewed\s+by))/mi
         ];
         
         for (const pattern of backgroundPatterns) {
             const match = text.match(pattern);
             if (match && match[1]) {
                 let background = match[1].trim()
-                    .replace(/\s+/g, ' ')
-                    .replace(/[\f\r]/g, '')
+                    .replace(/[\f\r]/g, '') // Remove form feeds and carriage returns
+                    .replace(/\s*\n\s*/g, '\n') // Normalize line breaks
                     .trim();
+                
+                // Format numbered lists properly
+                background = formatBackgroundText(background);
                 
                 if (background.length > 20) {
                     console.log(`Found background (${background.length} chars): ${background.substring(0, 100)}...`);
@@ -159,6 +306,37 @@ async function scrapeWithSelenium(url, meetingId) {
         
         // Load the page source into cheerio
         const $ = cheerio.load(pageSource);
+        
+        // Extract meeting date from the page
+        let meetingDate = '';
+        // Look for various possible date selectors
+        const dateSelectors = [
+            '#lblMeetingDate',
+            '.meeting-date',
+            '[id*="date"]',
+            '[class*="date"]'
+        ];
+        
+        for (const selector of dateSelectors) {
+            const dateElement = $(selector);
+            if (dateElement.length > 0) {
+                meetingDate = dateElement.text().trim();
+                if (meetingDate && meetingDate.length > 5) {
+                    console.log(`Found meeting date with selector '${selector}': ${meetingDate}`);
+                    break;
+                }
+            }
+        }
+        
+        // If no date found in selectors, try to find it in the page title or text
+        if (!meetingDate) {
+            const pageTitle = $('title').text();
+            const dateMatch = pageTitle.match(/(\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2}|[A-Za-z]+ \d{1,2}, \d{4})/);
+            if (dateMatch) {
+                meetingDate = dateMatch[1];
+                console.log(`Found meeting date in page title: ${meetingDate}`);
+            }
+        }
         
         // Look for agenda items with proper File Numbers (using working selector)
         console.log('Searching for agenda items...');
@@ -282,7 +460,12 @@ async function scrapeWithSelenium(url, meetingId) {
                         backgroundText = await extractBackgroundFromPDFWithBrowser(driver, summarySheetLink.href);
                         console.log(`Background extraction result: ${backgroundText.length} characters`);
                         if (backgroundText.length > 0) {
-                            console.log(`Background preview: ${backgroundText.substring(0, 100)}...`);
+                            console.log(`Background preview: ${backgroundText.substring(0, 200)}...`);
+                            // Save raw background text for debugging
+                            const debugDir = path.join(__dirname, 'debug');
+                            const debugBackgroundFile = path.join(debugDir, `item_${i + 1}_background.txt`);
+                            fs.writeFileSync(debugBackgroundFile, backgroundText);
+                            console.log(`Saved background text to ${debugBackgroundFile}`);
                         }
                     } catch (err) {
                         console.log(`Could not extract background: ${err.message}`);
@@ -306,6 +489,11 @@ async function scrapeWithSelenium(url, meetingId) {
                 global.agendaBackgrounds.push('');
             }
         }
+        
+        // Extract meeting date from the first summary sheet PDF
+        console.log('Extracting meeting date from summary sheet...');
+        const meetingDateStr = await extractMeetingDateFromFirstPDF(supportingDocs);
+        
         // --- Output logic: append supporting docs if found ---
         let markdownContent = orderedListItems.map((item, index) => {
             let cleanedItem = cleanAgendaContent(item);
@@ -328,6 +516,13 @@ async function scrapeWithSelenium(url, meetingId) {
             }
             return `${index + 1}. ${cleanedItem}`;
         }).join('\n\n');
+        
+        // Add meeting date heading at the beginning if available
+        if (meetingDateStr) {
+            const formattedDate = formatDateForDisplay(meetingDateStr);
+            const heading = `# Tampa City Council Agenda\n\n## ${formattedDate}\n\n`;
+            markdownContent = heading + markdownContent;
+        }
 
         // Extract file numbers and their list numbers
         const fileNumberMatches = markdownContent.match(/\d+\.\s+\*\*File No\. ([A-Z\/]+(?:[12])?-\d+-\d+(?:-[A-Z])?)\*\*/g) || [];
@@ -372,7 +567,17 @@ async function scrapeWithSelenium(url, meetingId) {
                 fs.mkdirSync(outputDir);
             }
             
-            let outputFileName = path.join(outputDir, `agenda_${meetingId}.md`);
+            // Create filename with meeting date if available
+            let fileName = `agenda_${meetingId}`;
+            if (meetingDateStr) {
+                // Convert date to YYYY-MM-DD format for filename
+                const formattedDate = formatDateForFilename(meetingDateStr);
+                if (formattedDate) {
+                    fileName = `agenda_${meetingId}_${formattedDate}`;
+                }
+            }
+            
+            let outputFileName = path.join(outputDir, `${fileName}.md`);
             fs.writeFileSync(outputFileName, markdownContent);
             
             console.log(`Successfully created: ${outputFileName}`);
@@ -453,6 +658,18 @@ async function scrapeMeetingIds(url) {
 }
 
 async function main() {
+    // Check if a specific meeting ID was provided as command line argument
+    const args = process.argv.slice(2);
+    const specificMeetingId = args[0];
+    
+    if (specificMeetingId) {
+        // Process single meeting
+        const meetingUrl = `https://tampagov.hylandcloud.com/221agendaonline/Meetings/ViewMeeting?id=${specificMeetingId}&doctype=1`;
+        console.log(`Scraping single meeting ID: ${specificMeetingId} with URL: ${meetingUrl}`);
+        await scrapeWithSelenium(meetingUrl, specificMeetingId);
+        return;
+    }
+    
     // URL of the page to scrape for meeting IDs
     let url = 'https://tampagov.hylandcloud.com/221agendaonline/';
     
@@ -477,5 +694,85 @@ if (require.main === module) {
 module.exports = {
     scrapeMeetingIds,
     scrapeWithSelenium,
-    extractBackgroundFromPDFWithBrowser
+    extractBackgroundFromPDFWithBrowser,
+    extractDollarAmounts,
+    formatBackgroundText
 };
+
+/**
+ * Extract meeting date from the first summary sheet PDF
+ * @param {Array} supportingDocs - Array of supporting documents for all items
+ * @returns {string} - Meeting date in MM/DD/YYYY format or empty string
+ */
+async function extractMeetingDateFromFirstPDF(supportingDocs) {
+    try {
+        // Find the first summary sheet PDF from any agenda item
+        for (let i = 0; i < supportingDocs.length; i++) {
+            const docs = supportingDocs[i];
+            if (docs && docs.length > 0) {
+                for (const doc of docs) {
+                    if (doc.text && doc.text.toLowerCase().includes('summary sheet') && 
+                        doc.href && doc.href.includes('.pdf')) {
+                        
+                        console.log(`Extracting meeting date from: ${doc.text}`);
+                        
+                        // Download and parse the PDF
+                        const pdfUrl = doc.href.startsWith('http') ? 
+                            doc.href : 
+                            'https://tampagov.hylandcloud.com' + doc.href.replace(/&amp;/g, '&');
+                        
+                        const response = await axios.get(pdfUrl, { responseType: 'arraybuffer' });
+                        const pdfData = await pdfParse(response.data);
+                        
+                        // Look for "Requested Meeting Date:" pattern
+                        const dateMatch = pdfData.text.match(/Requested Meeting Date:\s*(\d{1,2}\/\d{1,2}\/\d{4})/i);
+                        if (dateMatch) {
+                            console.log(`Found meeting date: ${dateMatch[1]}`);
+                            return dateMatch[1];
+                        }
+                        
+                        // Alternative patterns if the main one doesn't work
+                        const altDateMatch = pdfData.text.match(/Meeting Date:\s*(\d{1,2}\/\d{1,2}\/\d{4})/i);
+                        if (altDateMatch) {
+                            console.log(`Found alternative meeting date: ${altDateMatch[1]}`);
+                            return altDateMatch[1];
+                        }
+                    }
+                }
+            }
+        }
+        
+        console.log('No meeting date found in summary sheet PDFs');
+        return '';
+        
+    } catch (error) {
+        console.error('Error extracting meeting date from PDF:', error.message);
+        return '';
+    }
+}
+
+/**
+ * Format meeting date for display
+ * @param {string} dateStr - Date string in MM/DD/YYYY format
+ * @returns {string} - Formatted date string for display
+ */
+function formatDateForDisplay(dateStr) {
+    try {
+        if (!dateStr || !dateStr.match(/\d{1,2}\/\d{1,2}\/\d{4}/)) return '';
+        
+        const [month, day, year] = dateStr.split('/');
+        const date = new Date(year, month - 1, day);
+        
+        const options = { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        };
+        
+        return date.toLocaleDateString('en-US', options);
+    } catch (error) {
+        console.log(`Error formatting date ${dateStr}:`, error.message);
+        return dateStr; // Return original if formatting fails
+    }
+}
