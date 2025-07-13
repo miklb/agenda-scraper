@@ -52,7 +52,13 @@
   font-family: "PT Serif", serif;
   line-height: 1.6;
   color: #314a59; /* contrast */
-  border-top: 1px solid #8a8a82;
+}
+
+/* Ordered list styling inside details block for editor */
+.editor-styles-wrapper .wp-block-details .wp-block-list {
+  padding: 2rem;
+  margin: 0;
+  background: #f1f1e6; /* base */
 }
 
 .editor-styles-wrapper .agenda-supporting-docs {

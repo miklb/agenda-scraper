@@ -86,21 +86,41 @@ function formatBackgroundForWordPress(backgroundText) {
     const sections = backgroundText.split(/\n\s*\n/).filter(section => section.trim().length > 0);
     
     let formattedContent = '';
+    let listItems = [];
+    let regularParagraphs = [];
     
     sections.forEach(section => {
         const trimmedSection = section.trim();
         
         // Check if this looks like a numbered item
         if (trimmedSection.match(/^\d+\.\s/)) {
-            formattedContent += `\n<!-- wp:paragraph -->
-<p><strong>${trimmedSection}</strong></p>
-<!-- /wp:paragraph -->`;
+            // Remove the number and period, keep the rest
+            const itemText = trimmedSection.replace(/^\d+\.\s*/, '');
+            listItems.push(itemText);
         } else {
             // Regular paragraph
-            formattedContent += `\n<!-- wp:paragraph -->
-<p>${trimmedSection}</p>
-<!-- /wp:paragraph -->`;
+            regularParagraphs.push(trimmedSection);
         }
+    });
+    
+    // Add ordered list if we have numbered items
+    if (listItems.length > 0) {
+        formattedContent += `\n<!-- wp:list {"ordered":true} -->
+<ol>`;
+        listItems.forEach(item => {
+            formattedContent += `\n<!-- wp:list-item -->
+<li>${item}</li>
+<!-- /wp:list-item -->`;
+        });
+        formattedContent += `\n</ol>
+<!-- /wp:list -->`;
+    }
+    
+    // Add regular paragraphs
+    regularParagraphs.forEach(paragraph => {
+        formattedContent += `\n<!-- wp:paragraph -->
+<p>${paragraph}</p>
+<!-- /wp:paragraph -->`;
     });
     
     // If no structured content was found, treat as single paragraph

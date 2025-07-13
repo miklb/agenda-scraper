@@ -62,7 +62,13 @@
   font-family: var(--wp--preset--font-family--pt-serif);
   line-height: 1.6;
   color: var(--wp--preset--color--contrast); /* #314A59 */
-  border-top: 1px solid var(--wp--preset--color--accent-4);
+}
+
+/* Ordered list styling inside details block */
+.wp-block-details ol {
+  padding: var(--wp--preset--spacing--40);
+  margin: 0;
+  background: var(--wp--preset--color--base); /* #F1F1E6 */
 }
 
 /* Supporting Documents List Styling */
@@ -130,10 +136,9 @@
     padding-block: var(--wp--preset--spacing--20);
     padding-inline: var(--wp--preset--spacing--30);
   }
-
-  .wp-block-details p {
-    padding-block: var(--wp--preset--spacing--30);
-    padding-inline: var(--wp--preset--spacing--30);
+  .wp-block-details p,
+  .wp-block-details ol {
+    padding: var(--wp--preset--spacing--30);
   }
 
   .agenda-supporting-docs {
