@@ -75,6 +75,14 @@ This will:
 
 ## Version History
 
+### v1.2.0
+
+- **Fixed Duplicate Content Issue**: Resolved bug where agenda items with identical file numbers (e.g., "E2025-8 CH 24") would show duplicate content instead of their unique descriptions (closes #2)
+- **Enhanced Content Validation**: Improved wait conditions to check for specific itemId in supporting documents, ensuring each agenda item loads its correct content
+- **Retry Logic**: Added automatic retry mechanism when incorrect content is detected, with extended wait times for reliable content loading
+- **Better Item Distinction**: Enhanced processing of agenda items that share the same file number but have different purposes (e.g., Streetcar vs Westshore vs Downtown services)
+- **Improved Logging**: Added debug output to help identify content extraction issues during processing
+
 ### v1.1.1
 
 - **Production Code Cleanup**: Removed extensive debugging code and console.log statements for cleaner production output

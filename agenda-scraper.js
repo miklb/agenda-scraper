@@ -368,66 +368,162 @@ async function scrapeWithSelenium(url, meetingId) {
                 // Wait for the #itemView section to populate
                 await driver.wait(until.elementLocated(By.css('#itemView')), 10000);
                 
+                // Add a delay to ensure the content fully loads before checking
+                await new Promise(res => setTimeout(res, 2000));
+                
                 // Wait for content to actually load and be specific to this item
-                // We'll look for the specific file number in the content to ensure it's the right item
+                // For items with the same file number, we need to be more specific
                 const expectedFileNumber = item.fileNumber.match(/File No\. ([A-Z\d-]+)/);
                 const expectedFileNo = expectedFileNumber ? expectedFileNumber[1] : '';
                 
                 await driver.wait(async () => {
                     const itemViewHtml = await driver.findElement(By.css('#itemView')).getAttribute('innerHTML');
-                    return itemViewHtml && 
-                           itemViewHtml.trim().length > 100 && 
-                           itemViewHtml.includes('item-view-title-text') &&
-                           (expectedFileNo === '' || itemViewHtml.includes(expectedFileNo));
-                }, 15000);
+                    
+                    // Basic content validation
+                    if (!itemViewHtml || itemViewHtml.trim().length < 100 || !itemViewHtml.includes('item-view-title-text')) {
+                        return false;
+                    }
+                    
+                    // If we have an agendaItemId, ensure the content is for this specific item
+                    if (item.agendaItemId) {
+                        // Check for this specific itemId in document links (most reliable)
+                        const itemIdPattern = new RegExp(`[?&]itemId=${item.agendaItemId}[&\#]`);
+                        if (itemViewHtml.match(itemIdPattern)) {
+                            return true;
+                        }
+                        
+                        // Also check for itemId without trailing characters for end-of-url cases
+                        const itemIdPatternEnd = new RegExp(`[?&]itemId=${item.agendaItemId}$`);
+                        if (itemViewHtml.match(itemIdPatternEnd)) {
+                            return true;
+                        }
+                        
+                        // Also check for itemId in various other contexts
+                        if (itemViewHtml.includes(`itemId=${item.agendaItemId}&`) || 
+                            itemViewHtml.includes(`itemId=${item.agendaItemId}"`)) {
+                            return true;
+                        }
+                    }
+                    
+                    // Fallback for file number matching (less reliable for duplicate file numbers)
+                    return expectedFileNo === '' || itemViewHtml.includes(expectedFileNo);
+                }, 20000); // Increased timeout for more reliable loading
                 
                 // Get the populated content
                 const itemViewHtml = await driver.findElement(By.css('#itemView')).getAttribute('innerHTML');
                 const $itemView = cheerio.load(itemViewHtml);
                 
+                // Validate that we have the right content by checking document itemIds
+                if (item.agendaItemId) {
+                    const hasCorrectItemId = itemViewHtml.includes(`itemId=${item.agendaItemId}`);
+                    if (!hasCorrectItemId) {
+                        console.warn(`Warning: Item ${i + 1} (ID: ${item.agendaItemId}) may have loaded incorrect content`);
+                        // Try clicking again and waiting longer
+                        await driver.executeScript(`loadAgendaItem(${item.agendaItemId}, false);`);
+                        await new Promise(res => setTimeout(res, 3000));
+                        const retryHtml = await driver.findElement(By.css('#itemView')).getAttribute('innerHTML');
+                        const $retryView = cheerio.load(retryHtml);
+                        if (retryHtml.includes(`itemId=${item.agendaItemId}`)) {
+                            console.log(`Retry successful for item ${i + 1}`);
+                            // Use the retry content
+                            const retryDescription = $retryView('.item-view-title-text').text().trim();
+                            const retryItemText = retryDescription || item.fileNumber;
+                            console.log(`Item ${i + 1} (ID: ${item.agendaItemId}): Extracted ${retryItemText.substring(0, 100)}...`);
+                            orderedListItems.push(retryItemText);
+                            
+                            // Re-extract documents with retry content
+                            const retryDocLinks = [];
+                            let retrySummarySheetLink = null;
+                            $retryView('a[href*="DownloadFile"]').each((j, docLink) => {
+                                const $docLink = $retryView(docLink);
+                                const href = $docLink.attr('href');
+                                const title = $docLink.attr('title') || '';
+                                const text = $docLink.text().trim();
+                                if (href) {
+                                    const directHref = convertToDirectPDFUrl(href);
+                                    const docInfo = { href: directHref, title, text, originalHref: href };
+                                    retryDocLinks.push(docInfo);
+                                    
+                                    if (text.toLowerCase().includes('summary sheet') && 
+                                        text.toLowerCase().includes('cover sheet')) {
+                                        retrySummarySheetLink = docInfo;
+                                    }
+                                }
+                            });
+                            supportingDocs.push(retryDocLinks);
+                            
+                            // Extract background for retry
+                            let retryBackgroundText = '';
+                            if (retrySummarySheetLink) {
+                                try {
+                                    retryBackgroundText = await extractBackgroundFromPDFWithBrowser(driver, retrySummarySheetLink.href);
+                                } catch (err) {
+                                    console.log(`Could not extract background: ${err.message}`);
+                                }
+                            }
+                            if (!global.agendaBackgrounds) global.agendaBackgrounds = [];
+                            global.agendaBackgrounds.push(retryBackgroundText);
+                            
+                            continue; // Skip the normal processing
+                        }
+                    }
+                }
+                
                 // Extract the full description
                 const fullDescription = $itemView('.item-view-title-text').text().trim();
                 const finalItemText = fullDescription || item.fileNumber;
                 
+                // Add logging to verify correct content extraction
+                console.log(`Item ${i + 1} (ID: ${item.agendaItemId}): Extracted ${finalItemText.substring(0, 100)}...`);
+                
                 orderedListItems.push(finalItemText);
                 
-                // Extract supporting document links
-                const docLinks = [];
-                let summarySheetLink = null;
-                
-                $itemView('a[href*="DownloadFile"]').each((j, docLink) => {
-                    const $docLink = $itemView(docLink);
-                    const href = $docLink.attr('href');
-                    const title = $docLink.attr('title') || '';
-                    const text = $docLink.text().trim();
-                    if (href) {
-                        // Convert to direct download URL for PDFs
-                        const directHref = convertToDirectPDFUrl(href);
-                        const docInfo = { href: directHref, title, text, originalHref: href };
-                        docLinks.push(docInfo);
-                        
-                        // Track Summary Sheet for background extraction
-                        if (text.toLowerCase().includes('summary sheet') && 
-                            text.toLowerCase().includes('cover sheet')) {
-                            summarySheetLink = docInfo;
+                // Extract supporting document links (only if not already processed in retry)
+                if (orderedListItems[orderedListItems.length - 1] === finalItemText) {
+                    const docLinks = [];
+                    let summarySheetLink = null;
+                    
+                    $itemView('a[href*="DownloadFile"]').each((j, docLink) => {
+                        const $docLink = $itemView(docLink);
+                        const href = $docLink.attr('href');
+                        const title = $docLink.attr('title') || '';
+                        const text = $docLink.text().trim();
+                        if (href) {
+                            // Convert to direct download URL for PDFs
+                            const directHref = convertToDirectPDFUrl(href);
+                            const docInfo = { href: directHref, title, text, originalHref: href };
+                            docLinks.push(docInfo);
+                            
+                            // Track Summary Sheet for background extraction
+                            if (text.toLowerCase().includes('summary sheet') && 
+                                text.toLowerCase().includes('cover sheet')) {
+                                summarySheetLink = docInfo;
+                            }
+                        }
+                    });
+                    
+                    // Add logging for document extraction
+                    console.log(`Item ${i + 1} found ${docLinks.length} supporting documents`);
+                    if (docLinks.length > 0) {
+                        console.log(`First document href contains itemId: ${docLinks[0].href.includes('itemId=')}`);
+                    }
+                    
+                    supportingDocs.push(docLinks);
+                    
+                    // Try to extract background from Summary Sheet PDF if available
+                    let backgroundText = '';
+                    if (summarySheetLink) {
+                        try {
+                            backgroundText = await extractBackgroundFromPDFWithBrowser(driver, summarySheetLink.href);
+                        } catch (err) {
+                            console.log(`Could not extract background: ${err.message}`);
                         }
                     }
-                });
-                supportingDocs.push(docLinks);
-                
-                // Try to extract background from Summary Sheet PDF if available
-                let backgroundText = '';
-                if (summarySheetLink) {
-                    try {
-                        backgroundText = await extractBackgroundFromPDFWithBrowser(driver, summarySheetLink.href);
-                    } catch (err) {
-                        console.log(`Could not extract background: ${err.message}`);
-                    }
+                    
+                    // Store background text for later use
+                    if (!global.agendaBackgrounds) global.agendaBackgrounds = [];
+                    global.agendaBackgrounds.push(backgroundText);
                 }
-                
-                // Store background text for later use
-                if (!global.agendaBackgrounds) global.agendaBackgrounds = [];
-                global.agendaBackgrounds.push(backgroundText);
                 
             } catch (err) {
                 console.error(`Error extracting Item Details for agenda item ${i+1}:`, err.message);
