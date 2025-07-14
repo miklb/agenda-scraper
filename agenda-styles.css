@@ -93,9 +93,16 @@
 }
 
 .agenda-supporting-docs .wp-block-list li {
-  margin-bottom: var(--wp--preset--spacing--20);
+  margin-bottom: var(
+    --wp--preset--spacing--10
+  ); /* Reduced from spacing--20 for more compact layout */
   padding-left: var(--wp--preset--spacing--40);
   position: relative;
+  line-height: 1.4; /* Tighter line height for more compact look */
+  font-size: var(
+    --wp--preset--font-size--small,
+    0.875rem
+  ); /* Apply small font to entire list item */
 }
 
 .agenda-supporting-docs .wp-block-list li::before {
@@ -148,5 +155,8 @@
 
   .agenda-supporting-docs .wp-block-list li {
     padding-left: var(--wp--preset--spacing--30);
+    margin-bottom: var(
+      --wp--preset--spacing--10
+    ); /* Keep compact spacing on mobile */
   }
 }

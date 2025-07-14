@@ -279,7 +279,7 @@ function generateWordPressOutput(orderedListItems, supportingDocs, meetingId, so
     // Convert markdown bold syntax to HTML strong tags
     cleanedText = cleanedText.replace(/\*\*(File No\. (DE[12]-\d{2}-\d{2}(?:-[A-Z])?|TA\/CPA\d{2}-\d{2}|REZ-\d{2}-\d{2}|VAC-\d{2}-\d{4}|AB[12]-\d{2}-\d{2}|SU\d?-\d{2}-\d{2}))\*\*/gi, '<strong>$1</strong>');
     
-    // Store the processed item
+    // Store the processed item with supporting docs
     processedItems.push({ itemNumber, cleanedText, hasStrongTag });
     
     // Track the first occurrence of a strong tag
