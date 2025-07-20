@@ -226,7 +226,7 @@ async function extractBackgroundFromPDFWithBrowser(driver, pdfRelativeUrl) {
         const pdfData = await pdfParse(response.data);
         const text = pdfData.text;
         
-        // Look for background section with improved patterns
+        // Look for background section with specific patterns only
         const backgroundPatterns = [
             // Main background pattern - captures until common section headers
             /background\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff\s+recommendation|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|contact|prepared\s+by|reviewed\s+by|\n\s*\n|$))/i,
@@ -235,9 +235,7 @@ async function extractBackgroundFromPDFWithBrowser(driver, pdfRelativeUrl) {
             // Project background variant
             /project\s*background\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff\s+recommendation|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|contact|prepared\s+by|reviewed\s+by|\n\s*\n|$))/i,
             // Business case variant
-            /business\s*case\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff\s+recommendation|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|contact|prepared\s+by|reviewed\s+by|\n\s*\n|$))/i,
-            // Fallback: capture large text blocks that might be background
-            /^([\s\S]{200,}?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff\s+recommendation|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|contact|prepared\s+by|reviewed\s+by))/mi
+            /business\s*case\s*:?\s*([\s\S]*?)(?=\n\s*(?:fiscal\s+impact|recommendation|analysis|staff\s+recommendation|attachments?|budget|legal|conclusion|next\s+steps|justification|alternatives|contact|prepared\s+by|reviewed\s+by|\n\s*\n|$))/i
         ];
         
         for (const pattern of backgroundPatterns) {
