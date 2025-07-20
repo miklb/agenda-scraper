@@ -192,7 +192,7 @@ function cleanAgendaContent(content) {
     return cleaned;
 }
 
-function generateWordPressOutput(orderedListItems, supportingDocs, meetingId, sourceUrl, backgroundSections = []) {
+function generateWordPressOutput(orderedListItems, supportingDocs, meetingId, sourceUrl, backgroundSections = [], agendaItemIds = []) {
   // Transform the URL to the correct format
   const correctedUrl = sourceUrl
     .replace('/Documents/ViewAgenda', '/Meetings/ViewMeeting')
@@ -294,7 +294,11 @@ function generateWordPressOutput(orderedListItems, supportingDocs, meetingId, so
     wpHtml += `<!-- wp:list {"ordered":true} -->\n<ol class="wp-block-list">\n`;
     for (let i = 0; i < firstStrongIndex; i++) {
       const { cleanedText } = processedItems[i];
-      wpHtml += `<!-- wp:list-item -->\n<li>${cleanedText}</li>\n<!-- /wp:list-item -->\n`;
+      // Generate anchor ID - prefer agendaItemId, fallback to meetingId-itemNumber
+      const anchorId = (agendaItemIds[i] && agendaItemIds[i] !== null) ? 
+        `item-${agendaItemIds[i]}` : 
+        `${meetingId}-${i + 1}`;
+      wpHtml += `<!-- wp:list-item -->\n<li id="${anchorId}">${cleanedText}</li>\n<!-- /wp:list-item -->\n`;
     }
     wpHtml += `</ol>\n<!-- /wp:list -->\n\n`;
     
@@ -314,14 +318,22 @@ function generateWordPressOutput(orderedListItems, supportingDocs, meetingId, so
     wpHtml += `<!-- wp:list {"ordered":true,"start":${startNumber}} -->\n<ol start="${startNumber}" class="wp-block-list">\n`;
     for (let i = firstStrongIndex; i < processedItems.length; i++) {
       const { cleanedText } = processedItems[i];
-      wpHtml += `<!-- wp:list-item -->\n<li>${cleanedText}</li>\n<!-- /wp:list-item -->\n`;
+      // Generate anchor ID - prefer agendaItemId, fallback to meetingId-itemNumber
+      const anchorId = (agendaItemIds[i] && agendaItemIds[i] !== null) ? 
+        `item-${agendaItemIds[i]}` : 
+        `${meetingId}-${i + 1}`;
+      wpHtml += `<!-- wp:list-item -->\n<li id="${anchorId}">${cleanedText}</li>\n<!-- /wp:list-item -->\n`;
     }
     wpHtml += `</ol>\n<!-- /wp:list -->\n`;
   } else {
     // Single list - WordPress block format
     wpHtml += `<!-- wp:list {"ordered":true} -->\n<ol class="wp-block-list">\n`;
-    processedItems.forEach(({ cleanedText }) => {
-      wpHtml += `<!-- wp:list-item -->\n<li>${cleanedText}</li>\n<!-- /wp:list-item -->\n`;
+    processedItems.forEach(({ cleanedText }, index) => {
+      // Generate anchor ID - prefer agendaItemId, fallback to meetingId-itemNumber
+      const anchorId = (agendaItemIds[index] && agendaItemIds[index] !== null) ? 
+        `item-${agendaItemIds[index]}` : 
+        `${meetingId}-${index + 1}`;
+      wpHtml += `<!-- wp:list-item -->\n<li id="${anchorId}">${cleanedText}</li>\n<!-- /wp:list-item -->\n`;
     });
     wpHtml += `</ol>\n<!-- /wp:list -->\n`;
   }

@@ -344,6 +344,7 @@ async function scrapeWithSelenium(url, meetingId) {
         
         let orderedListItems = [];
         let supportingDocs = [];
+        let agendaItemIds = [];
         
         for (let i = 0; i < agendaItems.length; i++) {
             const item = agendaItems[i];
@@ -475,6 +476,7 @@ async function scrapeWithSelenium(url, meetingId) {
                 console.log(`Item ${i + 1} (ID: ${item.agendaItemId}): Extracted ${finalItemText.substring(0, 100)}...`);
                 
                 orderedListItems.push(finalItemText);
+                agendaItemIds.push(item.agendaItemId); // Collect the agendaItemId
                 
                 // Extract supporting document links (only if not already processed in retry)
                 if (orderedListItems[orderedListItems.length - 1] === finalItemText) {
@@ -597,9 +599,9 @@ async function scrapeWithSelenium(url, meetingId) {
         // Generate WordPress output with background sections if available
         const backgrounds = global.agendaBackgrounds || [];
         if (backgrounds.length > 0) {
-            generateWordPressOutput(orderedListItems, supportingDocs, meetingId, url, backgrounds);
+            generateWordPressOutput(orderedListItems, supportingDocs, meetingId, url, backgrounds, agendaItemIds);
         } else {
-            generateWordPressOutput(orderedListItems, supportingDocs, meetingId, url);
+            generateWordPressOutput(orderedListItems, supportingDocs, meetingId, url, [], agendaItemIds);
         }
 
         // Only write file if content exists
