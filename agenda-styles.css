@@ -92,6 +92,19 @@
   margin: 0;
 }
 
+/* CSS Grid layout for supporting docs with 6+ items */
+.agenda-supporting-docs .wp-block-list:has(li:nth-child(7)) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--wp--preset--spacing--20) var(--wp--preset--spacing--30);
+  margin-top: var(--wp--preset--spacing--20);
+}
+
+/* Reset margins for grid items */
+.agenda-supporting-docs .wp-block-list:has(li:nth-child(7)) li {
+  margin-bottom: 0;
+}
+
 .agenda-supporting-docs .wp-block-list li {
   margin-bottom: var(
     --wp--preset--spacing--10
@@ -150,13 +163,42 @@
 
   .agenda-supporting-docs {
     margin-top: var(--wp--preset--spacing--30);
-    padding-top: var(--wp--preset--spacing--20);
   }
 
   .agenda-supporting-docs .wp-block-list li {
-    padding-left: var(--wp--preset--spacing--30);
-    margin-bottom: var(
-      --wp--preset--spacing--10
-    ); /* Keep compact spacing on mobile */
+    font-size: var(--wp--preset--font-size--small);
+  }
+
+  /* Single column on mobile for grid layouts */
+  .agenda-supporting-docs .wp-block-list:has(li:nth-child(7)) {
+    grid-template-columns: 1fr;
+    gap: var(--wp--preset--spacing--10);
+  }
+}
+
+/* Tablet responsive adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .agenda-supporting-docs .wp-block-list:has(li:nth-child(7)) {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+}
+
+/* Fallback for browsers without :has() support */
+@supports not selector(:has(*)) {
+  .agenda-supporting-docs .wp-block-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--wp--preset--spacing--20) var(--wp--preset--spacing--30);
+  }
+
+  .agenda-supporting-docs .wp-block-list li {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 768px) {
+    .agenda-supporting-docs .wp-block-list {
+      grid-template-columns: 1fr;
+      gap: var(--wp--preset--spacing--10);
+    }
   }
 }
