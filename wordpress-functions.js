@@ -2,6 +2,54 @@ const fs = require('fs');
 const path = require('path');
 
 /**
+ * Extract date from agenda filename
+ * @param {string} filename - The filename to extract date from
+ * @returns {string|null} - Date in YYYY-MM-DD format or null if not found
+ */
+function extractDateFromFilename(filename) {
+    const match = filename.match(/agenda_\d+_(\d{4}-\d{2}-\d{2})/);
+    return match ? match[1] : null;
+}
+
+/**
+ * Find existing WordPress file for the same date
+ * @param {string} meetingId - Current meeting ID
+ * @param {string} meetingDateStr - Meeting date string
+ * @returns {string|null} - Path to existing file or null if not found
+ */
+function findExistingWordPressFileForDate(meetingId, meetingDateStr) {
+    const outputDir = path.join(__dirname, 'agendas');
+    
+    if (!meetingDateStr) return null;
+    
+    try {
+        const files = fs.readdirSync(outputDir);
+        const wpFiles = files.filter(file => file.endsWith('.wp.html'));
+        
+        for (const file of wpFiles) {
+            // Check for direct date-based naming (new format)
+            if (file === `agenda_${meetingDateStr}.wp.html`) {
+                return path.join(outputDir, file);
+            }
+            
+            // Also check old format with date suffix for backward compatibility
+            const fileDate = extractDateFromFilename(file);
+            if (fileDate === meetingDateStr) {
+                // Make sure it's not the same meeting ID
+                const fileMeetingId = file.match(/agenda_(\d+)/)?.[1];
+                if (fileMeetingId !== meetingId) {
+                    return path.join(outputDir, file);
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error reading agenda directory:', error);
+    }
+    
+    return null;
+}
+
+/**
  * Convert text to title case, preserving acronyms and file extensions
  * @param {string} text - The text to convert
  * @returns {string} - Title case text
@@ -192,7 +240,7 @@ function cleanAgendaContent(content) {
     return cleaned;
 }
 
-function generateWordPressOutput(orderedListItems, supportingDocs, meetingId, sourceUrl, backgroundSections = [], agendaItemIds = []) {
+function generateWordPressOutput(orderedListItems, supportingDocs, meetingId, sourceUrl, backgroundSections = [], agendaItemIds = [], meetingDateStr = null) {
   // Transform the URL to the correct format
   const correctedUrl = sourceUrl
     .replace('/Documents/ViewAgenda', '/Meetings/ViewMeeting')
@@ -338,12 +386,38 @@ function generateWordPressOutput(orderedListItems, supportingDocs, meetingId, so
     wpHtml += `</ol>\n<!-- /wp:list -->\n`;
   }
   
-  // Write the WordPress HTML file
+  // Check if we should combine with existing agenda for the same date
   const outputDir = path.join(__dirname, 'agendas');
-  let outputFileName = path.join(outputDir, `agenda_${meetingId}.wp.html`);
-  fs.writeFileSync(outputFileName, wpHtml);
+  const existingFile = findExistingWordPressFileForDate(meetingId, meetingDateStr);
   
-  console.log(`Successfully created WordPress-compatible file: ${outputFileName}`);
+  if (existingFile) {
+    // Read existing content
+    const existingContent = fs.readFileSync(existingFile, 'utf8');
+    
+    // Extract content starting from the Onbase link group (skip only the intro paragraph)
+    const introParaEnd = wpHtml.indexOf('<!-- /wp:paragraph -->');
+    const groupStart = wpHtml.indexOf('<!-- wp:group', introParaEnd);
+    const agendaContent = groupStart !== -1 ? 
+      wpHtml.substring(groupStart).trim() : 
+      wpHtml;
+    
+    // Append evening agenda with heading
+    const combinedContent = existingContent + `\n\n<!-- wp:heading {"level":2} -->
+<h2>Evening Agenda</h2>
+<!-- /wp:heading -->\n\n` + agendaContent;
+    
+    // Write to existing file
+    fs.writeFileSync(existingFile, combinedContent);
+    console.log(`Successfully appended evening agenda to existing file: ${existingFile}`);
+  } else {
+    // Create new file with date-based naming
+    const outputFileName = meetingDateStr ? 
+      path.join(outputDir, `agenda_${meetingDateStr}.wp.html`) :
+      path.join(outputDir, `agenda_${meetingId}.wp.html`);
+    
+    fs.writeFileSync(outputFileName, wpHtml);
+    console.log(`Successfully created WordPress-compatible file: ${outputFileName}`);
+  }
 }
 
 module.exports = {

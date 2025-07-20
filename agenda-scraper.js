@@ -309,6 +309,38 @@ async function scrapeWithSelenium(url, meetingId) {
             }
         }
         
+        // Look for date in h1 elements (for evening agendas)
+        if (!meetingDate) {
+            $('h1').each((i, el) => {
+                const text = $(el).text().trim();
+                // Look for patterns like "Thursday, July 24, 2025"
+                const dateMatch = text.match(/(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\s+([A-Za-z]+\s+\d{1,2},\s+\d{4})/i);
+                if (dateMatch) {
+                    meetingDate = dateMatch[1];
+                    return false; // break out of each loop
+                }
+                // Also look for MM/DD/YYYY patterns
+                const numericDateMatch = text.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+                if (numericDateMatch) {
+                    meetingDate = numericDateMatch[1];
+                    return false;
+                }
+            });
+        }
+        
+        // Look for date in span elements as fallback
+        if (!meetingDate) {
+            $('span').each((i, el) => {
+                const text = $(el).text().trim();
+                // Look for patterns like "Thursday, July 24, 2025"
+                const dateMatch = text.match(/(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\s+([A-Za-z]+\s+\d{1,2},\s+\d{4})/i);
+                if (dateMatch) {
+                    meetingDate = dateMatch[1];
+                    return false; // break out of each loop
+                }
+            });
+        }
+        
         // Look for agenda items with proper File Numbers (using working selector)
         let agendaItems = [];
         
@@ -536,8 +568,24 @@ async function scrapeWithSelenium(url, meetingId) {
             }
         }
         
-        // Extract meeting date from the first summary sheet PDF
-        const meetingDateStr = await extractMeetingDateFromFirstPDF(supportingDocs);
+        // Extract meeting date - try HTML first, then fall back to PDF
+        let meetingDateStr = meetingDate; // Use the date extracted from HTML
+        console.log(`\n=== Meeting Date Extraction ===`);
+        console.log(`HTML extracted date: "${meetingDate}"`);
+        
+        // If no date found in HTML, try PDF extraction as fallback
+        if (!meetingDateStr) {
+            console.log('No date found in HTML, trying PDF extraction...');
+            meetingDateStr = await extractMeetingDateFromFirstPDF(supportingDocs);
+            console.log(`PDF extracted date: "${meetingDateStr}"`);
+        }
+        
+        // Convert to filename format for debugging
+        if (meetingDateStr) {
+            const formattedForFile = formatDateForFilename(meetingDateStr);
+            console.log(`Final formatted date: "${formattedForFile}"`);
+        }
+        console.log(`=== End Date Extraction ===\n`);
         
         // --- Output logic: append supporting docs if found ---
         let markdownContent = orderedListItems.map((item, index) => {
@@ -598,10 +646,11 @@ async function scrapeWithSelenium(url, meetingId) {
 
         // Generate WordPress output with background sections if available
         const backgrounds = global.agendaBackgrounds || [];
+        const formattedDateForWP = meetingDateStr ? formatDateForFilename(meetingDateStr) : null;
         if (backgrounds.length > 0) {
-            generateWordPressOutput(orderedListItems, supportingDocs, meetingId, url, backgrounds, agendaItemIds);
+            generateWordPressOutput(orderedListItems, supportingDocs, meetingId, url, backgrounds, agendaItemIds, formattedDateForWP);
         } else {
-            generateWordPressOutput(orderedListItems, supportingDocs, meetingId, url, [], agendaItemIds);
+            generateWordPressOutput(orderedListItems, supportingDocs, meetingId, url, [], agendaItemIds, formattedDateForWP);
         }
 
         // Only write file if content exists
@@ -763,17 +812,28 @@ async function extractMeetingDateFromFirstPDF(supportingDocs) {
                         const response = await axios.get(pdfUrl, { responseType: 'arraybuffer' });
                         const pdfData = await pdfParse(response.data);
                         
+                        console.log(`\n=== PDF Date Extraction Debug ===`);
+                        console.log(`PDF URL: ${pdfUrl}`);
+                        console.log(`PDF Text preview: ${pdfData.text.substring(0, 500)}...`);
+                        
                         // Look for "Requested Meeting Date:" pattern
                         const dateMatch = pdfData.text.match(/Requested Meeting Date:\s*(\d{1,2}\/\d{1,2}\/\d{4})/i);
                         if (dateMatch) {
+                            console.log(`Found "Requested Meeting Date": ${dateMatch[1]}`);
                             return dateMatch[1];
                         }
                         
                         // Alternative patterns if the main one doesn't work
                         const altDateMatch = pdfData.text.match(/Meeting Date:\s*(\d{1,2}\/\d{1,2}\/\d{4})/i);
                         if (altDateMatch) {
+                            console.log(`Found "Meeting Date": ${altDateMatch[1]}`);
                             return altDateMatch[1];
                         }
+                        
+                        // Show all dates found for debugging
+                        const allDates = pdfData.text.match(/\d{1,2}\/\d{1,2}\/\d{4}/g);
+                        console.log(`All dates found in PDF: ${allDates ? allDates.join(', ') : 'none'}`);
+                        console.log(`=== End PDF Debug ===\n`);
                     }
                 }
             }
