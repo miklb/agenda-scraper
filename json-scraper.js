@@ -444,9 +444,14 @@ async function scrapeWithSelenium(url, meetingId, meetingType = 'regular') {
             
             // Only include items that start with "File No." and look like actual agenda items
             if (text.startsWith('File No.') && text.length > 10) {
-                // Extract the agenda item ID from the JavaScript href
+                // Initialize with null agenda item ID
+                let agendaItemId = null;
+                
+                // Extract the agenda item ID from the JavaScript href (old method)
                 const agendaItemIdMatch = href && href.match(/loadAgendaItem\((\d+),/);
-                const agendaItemId = agendaItemIdMatch ? agendaItemIdMatch[1] : null;
+                if (agendaItemIdMatch) {
+                    agendaItemId = agendaItemIdMatch[1];
+                }
                 
                 agendaItems.push({
                     number: agendaItems.length + 1,
@@ -461,6 +466,93 @@ async function scrapeWithSelenium(url, meetingId, meetingType = 'regular') {
         if (agendaItems.length === 0) {
             console.error(`No agenda item links found for meeting ${meetingId}`);
             return false;
+        }
+
+        // Try to find item IDs by scanning the document for supporting document links that contain itemId parameters
+        const supportingDocLinks = $('a[href*="DownloadFile"]');
+                const itemIdMap = {};
+        
+        // Group supporting document links by their itemId
+        const itemIdToFileNumbers = {};
+        
+        supportingDocLinks.each((index, link) => {
+            const href = $(link).attr('href');
+            if (href) {
+                const itemIdMatch = href.match(/itemId=(\d+)/);
+                if (itemIdMatch && itemIdMatch[1]) {
+                    const itemId = itemIdMatch[1];
+                    const text = $(link).text().trim();
+                    
+                    // Collect all document texts for this itemId
+                    if (!itemIdToFileNumbers[itemId]) {
+                        itemIdToFileNumbers[itemId] = [];
+                    }
+                    itemIdToFileNumbers[itemId].push(text);
+                    
+                    // Also try to extract file number from URL patterns
+                    const fileNumberMatch = href.match(/File_([A-Za-z0-9-_]+)\.pdf/i) || 
+                                           href.match(/\/([A-Za-z0-9-_]+)_\d+_/i);
+                    
+                    if (fileNumberMatch && fileNumberMatch[1]) {
+                        let fileNumberPart = fileNumberMatch[1].replace(/_/g, '/');
+                        // Map the item ID to the file number for later matching
+                        itemIdMap[fileNumberPart.toUpperCase()] = itemId;
+                    }
+                }
+            }
+        });        // Update agenda items with the extracted item IDs
+        for (let item of agendaItems) {
+            if (!item.agendaItemId) {
+                // Extract the file number (after "File No. ")
+                const fileNumberPart = item.fileNumber.substring(9).trim().toUpperCase();
+                
+                // Method 1: Direct matching using file number extracted from URLs
+                for (const [key, id] of Object.entries(itemIdMap)) {
+                    if (fileNumberPart.includes(key) || key.includes(fileNumberPart)) {
+                        item.agendaItemId = id;
+                        break;
+                    }
+                }
+                
+                // Method 2: If still no match, try using the collected document texts
+                if (!item.agendaItemId) {
+                    for (const [itemId, texts] of Object.entries(itemIdToFileNumbers)) {
+                        // Check if any of the texts contain the file number
+                        const matchingText = texts.find(text => {
+                            return text.toUpperCase().includes(fileNumberPart) || 
+                                  fileNumberPart.includes(text.toUpperCase());
+                        });
+                        
+                        if (matchingText) {
+                            item.agendaItemId = itemId;
+                            break;
+                        }
+                    }
+                }
+                
+                // If we're still unable to find the ID, use a more aggressive matching approach
+                if (!item.agendaItemId) {
+                    // Convert File No. AB2-25-04 to just AB2-25-04 or ab2-25-04
+                    const cleanFileNumber = fileNumberPart.replace(/[^A-Za-z0-9-]/g, '');
+                    
+                    for (const [itemId, texts] of Object.entries(itemIdToFileNumbers)) {
+                        for (const text of texts) {
+                            const cleanText = text.toUpperCase().replace(/[^A-Za-z0-9-]/g, '');
+                            if (cleanText.includes(cleanFileNumber) || cleanFileNumber.includes(cleanText)) {
+                                item.agendaItemId = itemId;
+                                break;
+                            }
+                        }
+                        if (item.agendaItemId) break;
+                    }
+                }
+            }
+        }
+        
+        // Log the extracted item IDs for debugging
+        console.log('Extracted agenda item IDs:');
+        for (const item of agendaItems) {
+            console.log(`File No. ${item.fileNumber}: Item ID = ${item.agendaItemId || 'Not found'}`);
         }
         
         // Now click each agenda item to get detailed information
@@ -538,6 +630,22 @@ async function scrapeWithSelenium(url, meetingId, meetingType = 'regular') {
                 // Add logging to verify correct content extraction
                 console.log(`Item ${i + 1} (ID: ${item.agendaItemId}): Extracted ${finalItemText.substring(0, 100)}...`);
                 
+                // Update the agendaItemId from the document URLs if we didn't have it before
+                if (!item.agendaItemId) {
+                    $itemView('a[href*="DownloadFile"]').each((j, docLink) => {
+                        const $docLink = $itemView(docLink);
+                        const href = $docLink.attr('href');
+                        if (href) {
+                            const itemIdMatch = href.match(/itemId=(\d+)/);
+                            if (itemIdMatch && itemIdMatch[1]) {
+                                item.agendaItemId = itemIdMatch[1];
+                                console.log(`Found item ID ${item.agendaItemId} from supporting document link for ${item.fileNumber}`);
+                                return false; // Break the loop after finding first match
+                            }
+                        }
+                    });
+                }
+                
                 // Extract supporting document links
                 const docLinks = [];
                 let summarySheetLink = null;
@@ -590,10 +698,23 @@ async function scrapeWithSelenium(url, meetingId, meetingType = 'regular') {
                 // Extract file number
                 const fileNo = extractFileNumber(finalItemText);
                 
+                // Extract item ID from supporting document URLs if not already set
+                let finalAgendaItemId = item.agendaItemId;
+                if (!finalAgendaItemId && docLinks.length > 0) {
+                    for (const doc of docLinks) {
+                        const itemIdMatch = doc.url.match(/itemId=(\d+)/);
+                        if (itemIdMatch && itemIdMatch[1]) {
+                            finalAgendaItemId = itemIdMatch[1];
+                            console.log(`Found item ID ${finalAgendaItemId} from supporting document URL for ${fileNo}`);
+                            break;
+                        }
+                    }
+                }
+                
                 // Create a structured object for this item
                 const itemObject = {
                     number: i + 1,
-                    agendaItemId: item.agendaItemId,
+                    agendaItemId: finalAgendaItemId,
                     fileNumber: fileNo,
                     title: cleanedContent,
                     rawTitle: finalItemText,
@@ -610,7 +731,7 @@ async function scrapeWithSelenium(url, meetingId, meetingType = 'regular') {
                 // Create a basic object with just the file number information
                 processedItems.push({
                     number: i + 1,
-                    agendaItemId: item.agendaItemId,
+                    agendaItemId: item.agendaItemId, // Keep original ID if available
                     fileNumber: item.fileNumber.replace('File No. ', ''),
                     title: item.fileNumber,
                     rawTitle: item.fileNumber,
