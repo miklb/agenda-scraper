@@ -357,7 +357,7 @@ function extractFileNumber(text) {
  * @param {string} meetingId - Meeting ID
  * @returns {Promise<boolean>} - Success status
  */
-async function scrapeWithSelenium(url, meetingId) {
+async function scrapeWithSelenium(url, meetingId, meetingType = 'regular') {
     let driver = await new Builder().forBrowser('chrome').build();
     try {
         await driver.get(url);
@@ -643,7 +643,7 @@ async function scrapeWithSelenium(url, meetingId) {
         // Create structured JSON object
         const meetingData = {
             meetingId: meetingId,
-            meetingType: detectMeetingType($), // Detect if regular, evening, etc.
+            meetingType: meetingType, // Use the provided meeting type from the main page
             meetingDate: meetingDateStr,
             formattedDate: formatDateForFilename(meetingDateStr),
             sourceUrl: url,
@@ -695,35 +695,33 @@ async function scrapeWithSelenium(url, meetingId) {
  * @returns {string} - Meeting type
  */
 function detectMeetingType($) {
-    // Check title and h1 elements for meeting type indicators
-    const title = $('title').text().toLowerCase();
-    let meetingType = 'regular'; // Default
-    
-    if (title.includes('evening')) {
-        meetingType = 'evening';
-    } else if (title.includes('special')) {
-        meetingType = 'special';
-    }
-    
-    // Also check h1 elements for more specific information
-    $('h1').each((i, el) => {
-        const text = $(el).text().toLowerCase().trim();
-        if (text.includes('evening')) {
-            meetingType = 'evening';
-            return false; // break the loop
-        } else if (text.includes('special')) {
-            meetingType = 'special';
-            return false; // break the loop
-        }
+    // Find the CITY OF TAMPA h1
+    const cityTampaH1 = $('h1').filter(function() {
+        return $(this).text().trim() === 'CITY OF TAMPA';
     });
+    
+    // Default meeting type if structure not found
+    let meetingType = 'regular';
+    
+    if (cityTampaH1.length > 0) {
+        // Get the next h1 element
+        const nextH1 = cityTampaH1.next('h1');
+        if (nextH1.length > 0) {
+            // Use the exact text content as the meeting type
+            const rawText = nextH1.text().trim();
+            if (rawText) {
+                meetingType = rawText;
+            }
+        }
+    }
     
     return meetingType;
 }
 
 /**
- * Scrape meeting IDs from the main page
+ * Scrape meeting IDs and types from the main page
  * @param {string} url - URL of the main page
- * @returns {Promise<Array<string>>} - Array of meeting IDs
+ * @returns {Promise<Array<Object>>} - Array of meeting objects with ID and type
  */
 async function scrapeMeetingIds(url) {
     // Set up the Selenium WebDriver
@@ -743,9 +741,10 @@ async function scrapeMeetingIds(url) {
         const $ = cheerio.load(pageSource);
         
         // Find all unique data-meeting-id attributes for <tr> where the last <td> includes an "Agenda" href (not "Summary")
-        let meetingIds = new Set();
+        let meetingData = [];
         $('#meetings-list-upcoming table:first-of-type tr').each((i, tr) => {
-            let lastTd = $(tr).find('td').last();
+            let $tr = $(tr);
+            let lastTd = $tr.find('td').last();
             let links = lastTd.find('a[href]');
             
             // Check if any link in this row contains "Agenda" and NOT "Summary"
@@ -764,22 +763,32 @@ async function scrapeMeetingIds(url) {
             });
             
             if (hasAgendaLink) {
-                let meetingId = $(tr).attr('data-meeting-id');
+                let meetingId = $tr.attr('data-meeting-id');
                 if (meetingId) {
                     // Explicitly exclude known summary meeting IDs
                     if (meetingId === '2651') {
                         // Skip summary meetings
                     } else {
-                        meetingIds.add(meetingId);
+                        // Extract the meeting type from the mtgType column
+                        let meetingType = 'regular'; // Default value
+                        
+                        // Find the cell with data-sortable-type="mtgType"
+                        const mtgTypeCell = $tr.find('td[data-sortable-type="mtgType"]');
+                        if (mtgTypeCell.length > 0) {
+                            meetingType = mtgTypeCell.text().trim();
+                        }
+                        
+                        // Add the meeting data to our collection
+                        meetingData.push({
+                            id: meetingId,
+                            type: meetingType
+                        });
                     }
                 }
             }
         });
         
-        // Convert the set to an array
-        let uniqueMeetingIds = Array.from(meetingIds);
-        
-        return uniqueMeetingIds;
+        return meetingData;
     } finally {
         // Quit the driver
         await driver.quit();
@@ -794,24 +803,29 @@ async function main() {
     const args = process.argv.slice(2);
     const specificMeetingId = args[0];
     
-    if (specificMeetingId) {
-        // Process single meeting
-        const meetingUrl = `https://tampagov.hylandcloud.com/221agendaonline/Meetings/ViewMeeting?id=${specificMeetingId}&doctype=1`;
-        await scrapeWithSelenium(meetingUrl, specificMeetingId);
-        return;
-    }
-    
     // URL of the page to scrape for meeting IDs
     let url = 'https://tampagov.hylandcloud.com/221agendaonline/';
     
-    // Get unique meeting IDs
-    let uniqueMeetingIds = await scrapeMeetingIds(url);
+    if (specificMeetingId) {
+        // For specific meeting ID, we still need to get its meeting type from the main page
+        const meetingData = await scrapeMeetingIds(url);
+        const meetingInfo = meetingData.find(meeting => meeting.id === specificMeetingId);
+        const meetingType = meetingInfo ? meetingInfo.type : 'regular';
+        
+        // Process single meeting with its type
+        const meetingUrl = `https://tampagov.hylandcloud.com/221agendaonline/Meetings/ViewMeeting?id=${specificMeetingId}&doctype=1`;
+        await scrapeWithSelenium(meetingUrl, specificMeetingId, meetingType);
+        return;
+    }
+    
+    // Get meetings with their IDs and types
+    let meetingsData = await scrapeMeetingIds(url);
     
     // Scrape each meeting ID sequentially
-    for (let meetingId of uniqueMeetingIds) {
+    for (let meeting of meetingsData) {
         // Use the correct rendered agenda URL
-        let meetingUrl = `https://tampagov.hylandcloud.com/221agendaonline/Meetings/ViewMeeting?id=${meetingId}&doctype=1`;
-        await scrapeWithSelenium(meetingUrl, meetingId);
+        let meetingUrl = `https://tampagov.hylandcloud.com/221agendaonline/Meetings/ViewMeeting?id=${meeting.id}&doctype=1`;
+        await scrapeWithSelenium(meetingUrl, meeting.id, meeting.type);
     }
 }
 
