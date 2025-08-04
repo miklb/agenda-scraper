@@ -1,112 +1,204 @@
-# Tampa City Council Agenda Scraper
+# Tampa City Council Agenda Scraper v2.0
 
-A Node.js application that scrapes Tampa City Council agendas and generates clean, readable markdown and WordPress-compatible HTML output with supporting documents and background information.
+A Node.js application that scrapes Tampa City Council agendas, stores them as structured JSON, and generates clean WordPress block markup with enhanced navigation and formatting.
 
-## Features
+## 🆕 Version 2.0 Features
 
-- **Clean Agenda Items**: Removes legal boilerplate text while preserving essential information
-- **Supporting Documents**: Extracts and displays links to all supporting documents with direct PDF URLs
-- **Background Information**: Automatically extracts "Background" sections from Summary Sheet PDFs with proper formatting
-- **Robust PDF Parsing**: Structure-based text formatting that preserves numbered lists and paragraph breaks
-- **Meeting Date Extraction**: Automatically extracts meeting dates from PDFs for filename and heading generation
-- **Dollar Amount Tables**: Generates summary tables with all financial amounts from agenda items
-- **Dual Output**: Generates both markdown (.md) and WordPress HTML (.wp.html) files
-- **WordPress Integration**: Uses proper WordPress block markup with collapsible details sections
-- **Title Case Formatting**: Automatically formats document link text to proper title case
+### **Two-Stage Processing Pipeline**
 
-## Output Examples
+- **JSON Scraper**: Extracts and stores meeting data as structured JSON files
+- **WordPress Converter**: Transforms JSON data into WordPress block markup
+- **Flexible Workflow**: Process meetings individually or by date with command-line options
 
-### Markdown Output
+### **Enhanced Navigation & UX**
 
-- Clean, readable agenda items
-- Supporting documents as markdown links
-- Background sections as plain text
+- **Session Headings**: Automatic "Morning Agenda" and "Evening Agenda" headings for multi-session days
+- **Quick Navigation**: Jump links between morning and evening sessions
+- **Anchor Links**: Direct linking to specific agenda sections with `#morning-agenda` and `#evening-agenda`
+- **Smart Sorting**: Evening meetings always appear last, regardless of meeting types
 
-### WordPress Output
+### **Improved WordPress Integration**
 
-- Proper WordPress block markup
-- Collapsible background sections using `<details>` blocks
-- Supporting documents with `target="_blank"` links
-- Interactive zoning map for development applications
-- CSS styling with theme.json color variables
+- **Background Details**: Collapsible `<details>` blocks for agenda item backgrounds
+- **Interactive Maps**: Automatic zoning maps for development applications with file number detection
+- **Session Management**: Intelligent combining of same-date meetings into single WordPress files
+- **Clean Markup**: Proper WordPress block structure with semantic HTML
 
-## Installation
+### **Robust Data Storage**
 
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Install Chrome/Chromium browser for PDF text extraction
+- **Structured JSON**: Meeting data stored as searchable, reusable JSON files
+- **Meeting Types**: Handles Regular, Evening, Special, and Workshop meetings
+- **Date-based Organization**: Files organized by meeting dates for easy retrieval
+- **Supporting Documents**: Complete document metadata with proper URL handling
 
-## Usage
+## Quick Start
 
-Run the scraper:
+### Installation
 
 ```bash
-node agenda-scraper.js
+npm install
 ```
 
-This will:
+### Basic Usage
 
-1. Scrape the latest Tampa City Council agenda
-2. Extract supporting documents and background information
-3. Generate both markdown and WordPress HTML files in the `agendas/` directory
+**Process all meetings and convert today's agendas:**
 
-## Output Files
+```bash
+npm run process
+```
 
-- `agenda_[meetingId].md` - Markdown format
-- `agenda_[meetingId].wp.html` - WordPress-compatible HTML
+**Process specific date:**
 
-## Dependencies
+```bash
+npm run process 2025-08-07
+```
 
-- **selenium-webdriver**: Browser automation for PDF text extraction
-- **cheerio**: HTML parsing and manipulation
-- **axios**: HTTP requests for web scraping
-- **pdf-parse**: PDF text extraction (alternative method)
+**Individual commands:**
+
+```bash
+# Scrape meetings to JSON
+npm run scrape
+
+# Convert JSON to WordPress markup
+npm run convert -- --date 2025-08-07
+```
+
+## Command Line Options
+
+### JSON Scraper (`json-scraper.js`)
+
+```bash
+node json-scraper.js [options]
+
+Options:
+  --help, -h              Show help
+  --start-date YYYY-MM-DD Start date for date range scraping
+  --end-date YYYY-MM-DD   End date for date range scraping
+```
+
+### WordPress Converter (`json-to-wordpress.js`)
+
+```bash
+node json-to-wordpress.js [options]
+
+Options:
+  --help, -h                    Show help
+  --date YYYY-MM-DD            Convert all meetings for specific date
+  --meetings ID1,ID2,...       Convert specific meeting IDs
+
+Examples:
+  node json-to-wordpress.js 2634                    # Single meeting
+  node json-to-wordpress.js --date 2025-07-31       # All meetings on date
+  node json-to-wordpress.js -m 2634,2589            # Multiple meetings
+```
+
+## NPM Scripts
+
+| Script                       | Description                                          |
+| ---------------------------- | ---------------------------------------------------- |
+| `npm run scrape`             | Run JSON scraper for all available meetings          |
+| `npm run convert`            | Run WordPress converter (requires date/meeting args) |
+| `npm run process`            | Complete workflow: scrape + convert today's meetings |
+| `npm run process 2025-08-07` | Complete workflow for specific date                  |
 
 ## File Structure
 
-- `agenda-scraper.js` - Main scraper script
-- `wordpress-functions.js` - WordPress HTML generation
-- `format-helpers.js` - Text formatting utilities
-- `agenda-styles.css` - Frontend CSS for WordPress
-- `editor-agenda-styles.css` - Editor CSS for WordPress admin
+### Core Scripts
+
+- `json-scraper.js` - Extracts meeting data to JSON files
+- `json-to-wordpress.js` - Converts JSON to WordPress markup
+- `process-agenda.sh` - Automated workflow script
+- `wordpress-functions.js` - WordPress formatting utilities
+
+### Data Organization
+
+```
+agenda-scraper/
+├── data/                           # JSON meeting data
+│   ├── meeting_2589_2025-07-31.json
+│   └── meeting_2634_2025-07-31.json
+├── agendas/                        # WordPress output files
+│   ├── agenda_2025-07-31.wp.html   # Combined morning + evening
+│   └── agenda_2025-08-07.wp.html   # Single meeting
+└── output/                         # Legacy markdown files
+```
+
+### Supporting Files
+
+- `format-helpers.js` - Text cleaning and formatting
+- `agenda-styles.css` - Frontend WordPress styles
+- `editor-agenda-styles.css` - WordPress editor styles
+
+## Output Examples
+
+### Single Meeting Output
+
+```html
+<!-- Quick intro paragraph -->
+<!-- Single "Agenda" heading with anchor -->
+<!-- Meeting link and agenda items -->
+```
+
+### Multiple Meetings Output
+
+```html
+<!-- Quick intro paragraph -->
+<!-- Navigation: Morning Agenda | Evening Agenda -->
+<!-- Morning Agenda heading and items -->
+<!-- Evening Agenda heading and items -->
+```
+
+### Enhanced Features
+
+- **Background Details**: `<details>` blocks with "Background" summary
+- **Supporting Documents**: Properly formatted document links
+- **Interactive Maps**: Automatic map blocks for zoning applications
+- **Smart Formatting**: File numbers in `<strong>` tags for development items
+
+## Dependencies
+
+- **selenium-webdriver**: Browser automation for web scraping
+- **cheerio**: HTML parsing and content extraction
+- **axios**: HTTP requests and web data fetching
+- **pdf-parse**: PDF text extraction capabilities
 
 ## Version History
 
+### v2.0.0 (Current)
+
+- **🔄 Architecture Redesign**: Split into two-stage pipeline (JSON storage + WordPress conversion)
+- **📱 Enhanced Navigation**: Added session headings and quick navigation links
+- **🎯 Smart Meeting Sorting**: Evening meetings always appear last
+- **⚓ Anchor Links**: Direct linking to morning/evening agenda sections
+- **📁 Structured Data**: JSON-first approach with reusable meeting data
+- **🛠 Flexible Workflow**: Command-line options for dates and meeting IDs
+- **📋 NPM Scripts**: Streamlined processing with `npm run process`
+- **🔧 Robust Error Handling**: Better validation and failure recovery
+- **📊 Multiple Meeting Types**: Support for Regular, Evening, Special, Workshop meetings
+
 ### v1.2.0
 
-- **Fixed Duplicate Content Issue**: Resolved bug where agenda items with identical file numbers (e.g., "E2025-8 CH 24") would show duplicate content instead of their unique descriptions (closes #2)
-- **Enhanced Content Validation**: Improved wait conditions to check for specific itemId in supporting documents, ensuring each agenda item loads its correct content
-- **Retry Logic**: Added automatic retry mechanism when incorrect content is detected, with extended wait times for reliable content loading
-- **Better Item Distinction**: Enhanced processing of agenda items that share the same file number but have different purposes (e.g., Streetcar vs Westshore vs Downtown services)
-- **Improved Logging**: Added debug output to help identify content extraction issues during processing
+- **Fixed Duplicate Content Issue**: Resolved agenda items with identical file numbers showing duplicate content
+- **Enhanced Content Validation**: Improved wait conditions for reliable content loading
+- **Retry Logic**: Added automatic retry mechanism for incorrect content detection
 
 ### v1.1.1
 
-- **Production Code Cleanup**: Removed extensive debugging code and console.log statements for cleaner production output
-- **File Organization**: Deleted obsolete utility files (background-extractor.js, parse-meeting.js, parse-pdf.js, selenium-background-extractor.js, single-scraper.js)
-- **Debug Artifact Removal**: Cleaned up debug directory and test files from development sessions
-- **Essential Logging Restoration**: Preserved critical user feedback messages for markdown and WordPress file creation
-- **Maintainability Improvements**: Streamlined codebase for better production readiness and maintenance
+- **Production Code Cleanup**: Removed debugging code for cleaner output
+- **File Organization**: Deleted obsolete utility files
+- **Maintainability Improvements**: Streamlined codebase
 
 ### v1.1.0
 
-- **Fixed PDF Background Formatting**: Implemented robust structure-based PDF text formatting that properly preserves numbered lists and paragraph breaks (closes #1)
-- **Enhanced Meeting Date Extraction**: Improved date parsing from Summary Sheet PDFs with better error handling
-- **Dollar Amount Preservation**: Fixed regex patterns to prevent corruption of monetary values during text processing
-- **Structural Text Processing**: Replaced brittle word-based pattern matching with structure-based approach that trusts PDF parser output
-- **Multi-Paragraph Support**: Correctly handles multiple paragraph breaks in background sections
+- **Fixed PDF Background Formatting**: Structure-based text formatting preserving lists and paragraphs
+- **Enhanced Meeting Date Extraction**: Improved date parsing with error handling
+- **Dollar Amount Preservation**: Fixed monetary value corruption during processing
 
 ### v1.0.0
 
 - Complete rewrite with supporting documents and background extraction
-- WordPress block markup output
-- CSS theme integration
-- Title case formatting for document links
-- Interactive zoning map integration
-- Automated PDF text extraction using browser automation
+- WordPress block markup output and CSS theme integration
+- Interactive zoning map integration and automated PDF text extraction
 
 ## License
 
