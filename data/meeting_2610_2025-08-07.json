@@ -1,0 +1,683 @@
+{
+  "meetingId": "2610",
+  "meetingType": "Council Regular",
+  "meetingDate": "August 7, 2025",
+  "formattedDate": "2025-08-07",
+  "sourceUrl": "https://tampagov.hylandcloud.com/221agendaonline/Meetings/ViewMeeting?id=2610&doctype=1",
+  "agendaItems": [
+    {
+      "number": 1,
+      "agendaItemId": null,
+      "fileNumber": "E2025-15",
+      "title": "File No. E2025-15 Presentation of Commendation to the Police Officer of the Month.",
+      "rawTitle": "File No. E2025-15\nPresentation of Commendation to the Police Officer of the Month.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 2,
+      "agendaItemId": null,
+      "fileNumber": "E2025-15",
+      "title": "File No. E2025-15 Presentation of Commendation to the ATU Local 1464 Employee of the Month.",
+      "rawTitle": "File No. E2025-15\nPresentation of Commendation to the ATU Local 1464 Employee of the Month.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 3,
+      "agendaItemId": null,
+      "fileNumber": "PS25-15649",
+      "title": "File No. PS25-15649 Resolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation, and/or appropriation of $5,000,000 within the general fund for use by Tampa Fire Rescue for fiscal year 2025 personnel and operating expenditures; providing an effective date. Memorandum from Michael Perry, Deputy Chief Financial Officer, and Chief Barbara Tripp, Tampa Fire Rescue, transmitting additional information for said agenda item. ",
+      "rawTitle": "File No. PS25-15649 \nResolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation, and/or appropriation of $5,000,000 within the general fund for use by Tampa Fire Rescue for fiscal year 2025 personnel and operating expenditures; providing an effective date.\n\nMemorandum from Michael Perry, Deputy Chief Financial Officer, and Chief Barbara Tripp, Tampa Fire Rescue, transmitting additional information for said agenda item. (To be R/F)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$5,000,000"
+      ]
+    },
+    {
+      "number": 4,
+      "agendaItemId": null,
+      "fileNumber": "PS25-15829",
+      "title": "File No. PS25-15829 Resolution approving the renewal of an award between the City of Tampa and Keystone Turbine Services, LLC, without a price escalation, for the furnishing of Engine Support for Rolls Royce Helicopters in the estimated amount of $562,000 for use by the Tampa Police Department.",
+      "rawTitle": "File No. PS25-15829\nResolution approving the renewal of an award between the City of Tampa and Keystone Turbine Services, LLC, without a price escalation, for the furnishing of Engine Support for Rolls Royce Helicopters in the estimated amount of $562,000 for use by the Tampa Police Department; authorizing the Director of Purchasing to purchase said property, supplies, materials or services; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$562,000"
+      ]
+    },
+    {
+      "number": 5,
+      "agendaItemId": null,
+      "fileNumber": "PS25-16110",
+      "title": "File No. PS25-16110 Resolution authorizing a Modification #3 to Subgrant Agreement (Contract Number R0590) between the Florida Division of Emergency Management and the City of Tampa to modify the agreement related to the FY 2022 Urban Area Security Initiative (UASI).",
+      "rawTitle": "File No. PS25-16110 \nResolution authorizing a Modification #3 to Subgrant Agreement (Contract Number R0590) between the Florida Division of Emergency Management and the City of Tampa to modify the agreement related to the FY 2022 Urban Area Security Initiative (UASI); authorizing execution thereof by the Mayor of the City of Tampa and attestation by the City Clerk; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 6,
+      "agendaItemId": null,
+      "fileNumber": "NCA25-15828",
+      "title": "File No. NCA25-15828 Resolution approving a First Amendment to the Subscription Services Agreement between the City of Tampa and Economic Modeling, LLC for the provision of Workforce Development Software Licensing in the estimated amount of $31,000 for use by the Neighborhood and Community Affairs Department, Workforce Partnerships and Special Projects Division; authorizing the Mayor to execute said First Amendment to the Subscription Services Agreement.",
+      "rawTitle": "File No. NCA25-15828\nResolution approving a First Amendment to the Subscription Services Agreement between the City of Tampa and Economic Modeling, LLC for the provision of Workforce Development Software Licensing in the estimated amount of $31,000 for use by the Neighborhood and Community Affairs Department, Workforce Partnerships and Special Projects Division; authorizing the Mayor to execute said First Amendment to the Subscription Services Agreement; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$31,000"
+      ]
+    },
+    {
+      "number": 7,
+      "agendaItemId": null,
+      "fileNumber": "NCA25-16072",
+      "title": "File No. NCA25-16072 Resolution approving a Cooperative Services Agreement between the City of Tampa, Florida and United States Department of Agriculture to provide wildlife damage management services by removing feral swine in the amount of Thirty-Five Thousand Dollars ($35,000) a year for four years for a total of One Hundred and Forty Thousand Dollars ($140,000).",
+      "rawTitle": "File No. NCA25-16072\nResolution approving a Cooperative Services Agreement between the City of Tampa, Florida and United States Department of Agriculture to provide wildlife damage management services by removing feral swine in the amount of Thirty-Five Thousand Dollars ($35,000) a year for four years for a total of One Hundred and Forty Thousand Dollars ($140,000); authorizing the execution thereof by the Mayor of the City of Tampa; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$35,000",
+        "$140,000"
+      ]
+    },
+    {
+      "number": 8,
+      "agendaItemId": null,
+      "fileNumber": "NCA25-16073",
+      "title": "File No. NCA25-16073 (Part 1 of 2)(See Item 9) Resolution approving a FY2022 Community Project Funding Grant Agreement no. B-22-CP-FL-0248 between the City of Tampa and the Department of Housing and Urban Development.",
+      "rawTitle": "File No. NCA25-16073 (Part 1 of 2)(See Item 9)\nResolution approving a FY2022 Community Project Funding Grant Agreement no. B-22-CP-FL-0248 between the City of Tampa and the Department of Housing and Urban Development; authorizing execution by the Mayor and attestation by the City Clerk; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 9,
+      "agendaItemId": null,
+      "fileNumber": "NCA25-16061",
+      "title": "File No. NCA25-16061 (Part 2 of 2)(See Item 8) Resolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation and/or appropriation of $1,000,000 within the Parks and Recreation Grants Capital Projects Fund for use by the East Tampa Recreational Complex project; providing an effective date. (Part 2 of 2).",
+      "rawTitle": "File No. NCA25-16061 (Part 2 of 2)(See Item 8)\nResolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation and/or appropriation of $1,000,000 within the Parks and Recreation Grants Capital Projects Fund for use by the East Tampa Recreational Complex project; providing an effective date. (Part 2 of 2)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$1,000,000"
+      ]
+    },
+    {
+      "number": 10,
+      "agendaItemId": null,
+      "fileNumber": "NCA25-16074",
+      "title": "File No. NCA25-16074 (Part 1 of 2)(See Item 11) Resolution approving a Volunteer Florida AmeriCorps Contract Agreement 2025-2026 between the City of Tampa and the Florida Commission on Community Service otherwise known as Volunteer Florida.",
+      "rawTitle": "File No. NCA25-16074 (Part 1 of 2)(See Item 11)\nResolution approving a Volunteer Florida AmeriCorps Contract Agreement 2025-2026 between the City of Tampa and the Florida Commission on Community Service otherwise known as Volunteer Florida; authorizing execution by the Mayor and attestation by the City Clerk; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 11,
+      "agendaItemId": null,
+      "fileNumber": "NCA25-16107",
+      "title": "File No. NCA25-16107 (Part 2 of 2)(See Item 10) Resolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation, and/or appropriation of $453,600 within the Parks Grants Fund for use by the Parks & Recreation Department for the AmeriCorps Tampa Urban Environmental Stewardship Grant.",
+      "rawTitle": "File No. NCA25-16107 (Part 2 of 2)(See Item 10)\nResolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation, and/or appropriation of $453,600 within the Parks Grants Fund for use by the Parks & Recreation Department for the AmeriCorps Tampa Urban Environmental Stewardship Grant; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$453,600"
+      ]
+    },
+    {
+      "number": 12,
+      "agendaItemId": null,
+      "fileNumber": "NCA25-16105",
+      "title": "File No. NCA25-16105 Resolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation and/or appropriation of $700,000 within the Community Investment Tax Capital Project Funds and $400,000 within the Utilities Services Tax Capital Projects Fund for use by the Perry Harvey Sr. Park Bandshell project.",
+      "rawTitle": "File No. NCA25-16105\nResolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation and/or appropriation of $700,000 within the Community Investment Tax Capital Project Funds and $400,000 within the Utilities Services Tax Capital Projects Fund for use by the Perry Harvey Sr. Park Bandshell project; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$700,000",
+        "$400,000"
+      ]
+    },
+    {
+      "number": 13,
+      "agendaItemId": null,
+      "fileNumber": "NCA25-16111",
+      "title": "File No. NCA25-16111 Resolution approving Contract 25-X-01628 Sulphur Springs Pool Restoration Phase 1 between the City of Tampa and On Track Life Solutions, Inc. for the provision of Sulphur Springs Pool Investigation and Stabilization in the estimated amount of $1,833,700 for use by the Parks and Recreation Department.",
+      "rawTitle": "File No. NCA25-16111\nResolution approving Contract 25-X-01628 Sulphur Springs Pool Restoration Phase 1 between the City of Tampa and On Track Life Solutions, Inc. for the provision of Sulphur Springs Pool Investigation and Stabilization in the estimated amount of $1,833,700 for use by the Parks and Recreation Department; authorizing the Mayor to execute said agreement; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$1,833,700"
+      ]
+    },
+    {
+      "number": 14,
+      "agendaItemId": null,
+      "fileNumber": "E2025-8",
+      "title": "File No. E2025-8 CH 28 Special Event Permit: TPD Memorial Run/Walk- Madison St., Tampa St., Brorein St. Bridge, Bayshore Blvd.- October 11, 2025.",
+      "rawTitle": "File No. E2025-8 CH 28\nSpecial Event Permit: TPD Memorial Run/Walk- Madison St., Tampa St., Brorein St. Bridge, Bayshore Blvd.- October 11, 2025",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 15,
+      "agendaItemId": null,
+      "fileNumber": "INF25-15784",
+      "title": "File No. INF25-15784 Resolution of the City of Tampa, Florida, approving a Fourth Amendment to Master Agreement between the City of Tampa and Timmons Group, Inc., and approving a Second Amendment to Software License and Maintenance Agreement between the City Of Tampa and Azteca Systems, LLC, for the provision of an Asset/Work Management System in the estimated amount of $34,500 for use by the Mobility Department and Water Department; authorizing the Mayor to execute said Amendments.",
+      "rawTitle": "File No. INF25-15784\nResolution of the City of Tampa, Florida, approving a Fourth Amendment to Master Agreement between the City of Tampa and Timmons Group, Inc., and approving a Second Amendment to Software License and Maintenance Agreement between the City Of Tampa and Azteca Systems, LLC, for the provision of an Asset/Work Management System in the estimated amount of $34,500 for use by the Mobility Department and Water Department; authorizing the Mayor to execute said Amendments; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$34,500"
+      ]
+    },
+    {
+      "number": 16,
+      "agendaItemId": null,
+      "fileNumber": "INF25-15823",
+      "title": "File No. INF25-15823 Resolution of the City Council of the City of Tampa, Florida, approving Amendment No. 1 to the Affiliation Agreement between the City of Tampa and the University of South Florida Board of Trustees for Student Internship Placement.",
+      "rawTitle": "File No. INF25-15823\nResolution of the City Council of the City of Tampa, Florida, approving Amendment No. 1 to the Affiliation Agreement between the City of Tampa and the University of South Florida Board of Trustees for Student Internship Placement; authorizing execution by the Mayor and attestation by the City Clerk; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 17,
+      "agendaItemId": null,
+      "fileNumber": "INF25-15873",
+      "title": "File No. INF25-15873 Resolution authorizing an Agreement for Consultant Services in the amount of $2,012,950.94 between the City of Tampa and HNTB Corporation in connection with Contract 24-D-00018, City of Tampa MacDill Air Force Base Access Improvements Project.",
+      "rawTitle": "File No. INF25-15873\nResolution authorizing an Agreement for Consultant Services in the amount of $2,012,950.94 between the City of Tampa and HNTB Corporation in connection with Contract 24-D-00018, City of Tampa MacDill Air Force Base Access Improvements Project; authorizing the Mayor of the City of Tampa to execute said Agreement on behalf of the City of Tampa; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$2,012,950.94"
+      ]
+    },
+    {
+      "number": 18,
+      "agendaItemId": null,
+      "fileNumber": "INF25-16026",
+      "title": "File No. INF25-16026 Resolution approving the renewal of an Award between the City of Tampa and SAT Industrial Supplies & Solutions LLC, with a 5.0% Manufacturer’s Increase, for the provision of Brass Fittings for the Water Service Group I (Sheltered Market Solicitation) in the estimated amount of $425,520 for use by the Water Department.",
+      "rawTitle": "File No. INF25-16026\nResolution approving the renewal of an Award between the City of Tampa and SAT Industrial Supplies & Solutions LLC, with a 5.0% Manufacturer’s Increase, for the provision of Brass Fittings for the Water Service Group I (Sheltered Market Solicitation) in the estimated amount of $425,520 for use by the Water Department; authorizing the Director of Purchasing to purchase said property, supplies, materials or services; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$425,520"
+      ]
+    },
+    {
+      "number": 19,
+      "agendaItemId": null,
+      "fileNumber": "INF25-16027",
+      "title": "File No. INF25-16027 Resolution approving the renewal of an Award between the City of Tampa and SAT Industrial Supplies & Solutions LLC, with a 5.0% Manufacturer’s Price Increase for the provision of Brass Fittings for Water Service Group II (Sheltered Market Solicitation) in the estimated amount of $430,729 for use by the Water Department.",
+      "rawTitle": "File No. INF25-16027\nResolution approving the renewal of an Award between the City of Tampa and SAT Industrial Supplies & Solutions LLC, with a 5.0% Manufacturer’s Price Increase for the provision of Brass Fittings for Water Service Group II (Sheltered Market Solicitation) in the estimated amount of $430,729 for use by the Water Department; authorizing the Director of Purchasing to purchase said property, supplies, materials or services; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$430,729"
+      ]
+    },
+    {
+      "number": 20,
+      "agendaItemId": null,
+      "fileNumber": "INF25-16108",
+      "title": "File No. INF25-16108 Resolution authorizing an Agreement for Consultant Services in the amount of $141,825 between the City of Tampa and Wilder Architecture, Inc. in connection with Contract 24-D-00040 New Fire Fleet Maintenance Building Assessment.",
+      "rawTitle": "File No. INF25-16108\nResolution authorizing an Agreement for Consultant Services in the amount of $141,825 between the City of Tampa and Wilder Architecture, Inc. in connection with Contract 24-D-00040 New Fire Fleet Maintenance Building Assessment; authorizing the Mayor of the City of Tampa to execute same; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$141,825"
+      ]
+    },
+    {
+      "number": 21,
+      "agendaItemId": null,
+      "fileNumber": "INF25-16109",
+      "title": "File No. INF25-16109 Resolution accepting the proposal of Timm Group Building & General Contractors pertaining to Contract 24-C-00002 E/W Green Spine Cycle Track – PH 2A from Howard Ave to Rome Ave, in the amount of $994,620; authorizing the Mayor of the City of Tampa to execute said contract on behalf of the City of Tampa.",
+      "rawTitle": "File No. INF25-16109\nResolution accepting the proposal of Timm Group Building & General Contractors pertaining to Contract 24-C-00002 E/W Green Spine Cycle Track – PH 2A from Howard Ave to Rome Ave, in the amount of $994,620; authorizing the Mayor of the City of Tampa to execute said contract on behalf of the City of Tampa; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$994,620"
+      ]
+    },
+    {
+      "number": 22,
+      "agendaItemId": null,
+      "fileNumber": "F25-15808",
+      "title": "File No. F25-15808 Resolution approving ordering documents US-18531862, CPQ-3807561-1 and CPQ-3597948-1 to expand the existing Annual Subscription of Software as a Service (SaaS) to include a Human Capital Module; to convert the Billing Module for Infrastructure as a Service (IaaS) and Platform as a Service (PaaS) from a Non-Metered Cloud Service to a Universal Credits Model; and for the provision of Continued Mission Critical Support Services under the Public Sector Agreement for Oracle Cloud Services (Agreement No. US-CSA-2635540), as amended, between the City of Tampa and Oracle America, Inc. for Oracle Fusion Applications Cloud SaaS Services in the total estimated amount of $139,363.15 for use by the Technology and Innovation Department; authorizing the Mayor to execute said ordering documents.",
+      "rawTitle": "File No. F25-15808\nResolution approving ordering documents US-18531862, CPQ-3807561-1 and CPQ-3597948-1 to expand the existing Annual Subscription of Software as a Service (SaaS) to include a Human Capital Module; to convert the Billing Module for Infrastructure as a Service (IaaS) and Platform as a Service (PaaS) from a Non-Metered Cloud Service to a Universal Credits Model; and for the provision of Continued Mission Critical Support Services under the Public Sector Agreement for Oracle Cloud Services (Agreement No. US-CSA-2635540), as amended, between the City of Tampa and Oracle America, Inc. for Oracle Fusion Applications Cloud SaaS Services in the total estimated amount of $139,363.15 for use by the Technology and Innovation Department; authorizing the Mayor to execute said ordering documents; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$139,363.15"
+      ]
+    },
+    {
+      "number": 23,
+      "agendaItemId": null,
+      "fileNumber": "F25-16024",
+      "title": "File No. F25-16024 Resolution authorizing a compromise settlement by the City of Tampa in the amount of One Hundred Fifty Thousand ($150,000.00) of the lawsuit Celestino Deliz v. City of Tampa, Case No. 24-CA-003470, in the Thirteenth Judicial Circuit of Florida; and providing for an effective date. ",
+      "rawTitle": "File No. F25-16024\nResolution authorizing a compromise settlement by the City of Tampa in the amount of One Hundred Fifty Thousand ($150,000.00) of the lawsuit Celestino Deliz v. City of Tampa, Case No. 24-CA-003470, in the Thirteenth Judicial Circuit of Florida; and providing for an effective date.\n\nMemorandum from Andrea Zelman, City Attorney, and Tonyin Aina-Hargrett, Sr. Assistant City Attorney, transmitting additional information for said agenda item. (To be R/F)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$150,000.00"
+      ]
+    },
+    {
+      "number": 24,
+      "agendaItemId": null,
+      "fileNumber": "F25-16049",
+      "title": "File No. F25-16049 Resolution Approving a Second Amendment to Riskmaster Access Agreement between the City of Tampa and Computer Sciences Corporation to amend the term of the agreement in the estimated amount of $50,271 for use by the Human Resources Department/Risk Management Division.",
+      "rawTitle": "File No. F25-16049\nResolution Approving a Second Amendment to Riskmaster Access Agreement between the City of Tampa and Computer Sciences Corporation to amend the term of the agreement in the estimated amount of $50,271 for use by the Human Resources Department/Risk Management Division; authorizing execution thereof by the Mayor of the City of Tampa; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$50,271"
+      ]
+    },
+    {
+      "number": 25,
+      "agendaItemId": null,
+      "fileNumber": "AR25-16104",
+      "title": "File No. AR25-16104 Christine Glover, Director of Internal Audit, transmitting audit report Tampa Fire Rescue-Emergency Management, dated July 19, 2025 .",
+      "rawTitle": "File No. AR25-16104\nChristine Glover, Director of Internal Audit, transmitting audit report Tampa Fire Rescue-Emergency Management, dated July 19, 2025 (To be R/F)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 26,
+      "agendaItemId": null,
+      "fileNumber": "DEO25-15845",
+      "title": "File No. DEO25-15845 Resolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation, and/or appropriation of $1,800,000 for the East Tampa Community Redevelopment Area (CRA) Sanchez Y Haya Restoration Project within the East Tampa CRA fund.",
+      "rawTitle": "File No. DEO25-15845\nResolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation, and/or appropriation of $1,800,000 for the East Tampa Community Redevelopment Area (CRA) Sanchez Y Haya Restoration Project within the East Tampa CRA fund; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$1,800,000"
+      ]
+    },
+    {
+      "number": 27,
+      "agendaItemId": null,
+      "fileNumber": "DEO25-15846",
+      "title": "File No. DEO25-15846 Resolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation, and/or appropriation of $100,000 for the East Tampa Community Redevelopment Area (CRA) Tree Trimming within the East Tampa CRA fund.",
+      "rawTitle": "File No. DEO25-15846\nResolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation, and/or appropriation of $100,000 for the East Tampa Community Redevelopment Area (CRA) Tree Trimming within the East Tampa CRA fund; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$100,000"
+      ]
+    },
+    {
+      "number": 28,
+      "agendaItemId": null,
+      "fileNumber": "DEO25-15847",
+      "title": "File No. DEO25-15847 Resolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation, and/or appropriation of $500,000 for additional Down Payment Assistance within the East Tampa CRA fund.",
+      "rawTitle": "File No. DEO25-15847\n Resolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation, and/or appropriation of $500,000 for additional Down Payment Assistance within the East Tampa CRA fund; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$500,000"
+      ]
+    },
+    {
+      "number": 29,
+      "agendaItemId": null,
+      "fileNumber": "DEO25-15848",
+      "title": "File No. DEO25-15848 Resolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation, and/or appropriation of $600,0000 for Fremont Avenue Grid Reestablishment Project within the West Tampa CRA fund.",
+      "rawTitle": "File No. DEO25-15848\nResolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation, and/or appropriation of $600,0000 for Fremont Avenue Grid Reestablishment Project within the West Tampa CRA fund; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$600,000"
+      ]
+    },
+    {
+      "number": 30,
+      "agendaItemId": null,
+      "fileNumber": "DEO25-16025",
+      "title": "File No. DEO25-16025 Resolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation, and/or appropriation of $71,250.00 within the Florida Department of Transportation (FDOT) - Interstate Highway Expansion Phase I Trust Funds for historic rehabilitation of property.",
+      "rawTitle": "File No. DEO25-16025\nResolution making certain changes in the budget of the City of Tampa for the fiscal year ending September 30, 2025; approving the transfer, reallocation, and/or appropriation of $71,250.00 within the Florida Department of Transportation (FDOT) - Interstate Highway Expansion Phase I Trust Funds for historic rehabilitation of property; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$71,250.00"
+      ]
+    },
+    {
+      "number": 31,
+      "agendaItemId": null,
+      "fileNumber": "DEO25-16050",
+      "title": "File No. DEO25-16050 Resolution approving the execution by the Mayor and attestation by the City Clerk of a Quit Claim Deed between the City of Tampa, as Grantor, and the State of Florida Department of Transportation, as Grantee, for the conveyance of a portion of real property located at 1902 West Busch Boulevard, Tampa, Florida, for no monetary consideration; Approving acceptance of the Quit Claim Deed.",
+      "rawTitle": "File No. DEO25-16050\nResolution approving the execution by the Mayor and attestation by the City Clerk of a Quit Claim Deed between the City of Tampa, as Grantor, and the State of Florida Department of Transportation, as Grantee, for the conveyance of a portion of real property located at 1902 West Busch Boulevard, Tampa, Florida, for no monetary consideration; Approving acceptance of the Quit Claim Deed; Providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 32,
+      "agendaItemId": null,
+      "fileNumber": "DEO25-16051",
+      "title": "File No. DEO25-16051 Resolution approving the acceptance of a Warranty Deed from Busch Storage Associates, LLC, to the City of Tampa for a portion of the real property at 4848 East Busch Boulevard, Tampa, Florida, for right of way dedication.",
+      "rawTitle": "File No. DEO25-16051\nResolution approving the acceptance of a Warranty Deed from Busch Storage Associates, LLC, to the City of Tampa for a portion of the real property at 4848 East Busch Boulevard, Tampa, Florida, for right of way dedication; Providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 33,
+      "agendaItemId": null,
+      "fileNumber": "DEO25-16060",
+      "title": "File No. DEO25-16060 Resolution approving the execution by the Mayor and attestation by the City Clerk of a Grant of Utility Easement, located at 1010 North Macinnes Place, Tampa, Florida, in favor of Tampa Electric Company for the provision of electrical service.",
+      "rawTitle": "File No. DEO25-16060\nResolution approving the execution by the Mayor and attestation by the City Clerk of a Grant of Utility Easement, located at 1010 North Macinnes Place, Tampa, Florida, in favor of Tampa Electric Company for the provision of electrical service; Providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 34,
+      "agendaItemId": null,
+      "fileNumber": "DEO25-16062",
+      "title": "File No. DEO25-16062 Resolution approving the execution by the Mayor and attestation by the City Clerk of a Subordination of City Utility Interests in favor of Florida Department of Transportation to allow for joint use of City's easement area located at 4600 West Cypress Street.",
+      "rawTitle": "File No. DEO25-16062\nResolution approving the execution by the Mayor and attestation by the City Clerk of a Subordination of City Utility Interests in favor of Florida Department of Transportation to allow for joint use of City's easement area located at 4600 West Cypress Street; Providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 35,
+      "agendaItemId": null,
+      "fileNumber": "DEO25-16075",
+      "title": "File No. DEO25-16075 Resolution approving the execution by the Mayor and attestation by the City Clerk of a License and Hold Harmless Agreement between the City of Tampa, and the Supervisor of Elections of Hillsborough County, for the use of several City-owned parks and recreation facilities as polling locations for the 2025 Elections.",
+      "rawTitle": "File No. DEO25-16075\nResolution approving the execution by the Mayor and attestation by the City Clerk of a License and Hold Harmless Agreement between the City of Tampa, and the Supervisor of Elections of Hillsborough County, for the use of several City-owned parks and recreation facilities as polling locations for the 2025 Elections; Providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 36,
+      "agendaItemId": null,
+      "fileNumber": "MAM25-15779",
+      "title": "File No. MAM25-15779 Resolution of the City of Tampa, Florida, approving a participating addendum to Sourcewell Contract Number 081524-JFA and a participating addendum to Sourcewell Contract Number 081524-DVR between the City of Tampa and JF Acquisition, LLC, dba JF Petroleum Group and OPW Fuel Management Systems, LLC, dba Wayne Fueling Systems LLC for the purchase of Aboveground Fuel and Fluid Storage with Related Hardware, Software, and Services in the estimated amount of $154,073.24, for use by the Logistics and Asset Management Department/Fleet Maintenance; authorizing the Mayor to execute said addendums.",
+      "rawTitle": "File No. MAM25-15779\nResolution of the City of Tampa, Florida, approving a participating addendum to Sourcewell Contract Number 081524-JFA and a participating addendum to Sourcewell Contract Number 081524-DVR between the City of Tampa and JF Acquisition, LLC, dba JF Petroleum Group and OPW Fuel Management Systems, LLC, dba Wayne Fueling Systems LLC for the purchase of Aboveground Fuel and Fluid Storage with Related Hardware, Software, and Services in the estimated amount of $154,073.24, for use by the Logistics and Asset Management Department/Fleet Maintenance; authorizing the Mayor to execute said addendums; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$154,073.24"
+      ]
+    },
+    {
+      "number": 37,
+      "agendaItemId": null,
+      "fileNumber": "MAM25-15782",
+      "title": "File No. MAM25-15782 Resolution approving the purchase under Sourcewell Contract No. 110421-ALT: Public Utility Equipment with Related Accessories and Supplies of two (2) Ford F550 with Altec AT41S Telescopic Aerial Signal Trucks from Altec Industries, Inc. at a unit price of $210,010 for a cumulative amount of $420,020 for use by the Mobility Department.",
+      "rawTitle": "File No. MAM25-15782\nResolution approving the purchase under Sourcewell Contract No. 110421-ALT: Public Utility Equipment with Related Accessories and Supplies of two (2) Ford F550 with Altec AT41S Telescopic Aerial Signal Trucks from Altec Industries, Inc. at a unit price of $210,010 for a cumulative amount of $420,020 for use by the Mobility Department; authorizing the Director of Purchasing to purchase said property, supplies, materials or services; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$210,010",
+        "$420,020"
+      ]
+    },
+    {
+      "number": 38,
+      "agendaItemId": null,
+      "fileNumber": "MAM25-15809",
+      "title": "File No. MAM25-15809 Resolution approving the renewal of an award between the City of Tampa and ODM Truck Inc, without a price escalation, for the furnishing of Hauling of Asphaltic Materials (Sheltered Market Solicitation) Rebid in the estimated amount of $500,000 for use by the Mobility Department.",
+      "rawTitle": "File No. MAM25-15809\nResolution approving the renewal of an award between the City of Tampa and ODM Truck Inc, without a price escalation, for the furnishing of Hauling of Asphaltic Materials (Sheltered Market Solicitation) Rebid in the estimated amount of $500,000 for use by the Mobility Department; authorizing the Director of Purchasing to purchase said property, supplies, materials or services; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$500,000"
+      ]
+    },
+    {
+      "number": 39,
+      "agendaItemId": null,
+      "fileNumber": "MAM25-15836",
+      "title": "File No. MAM25-15836 Resolution approving a Piggyback Agreement for Auctioneer Services between the City of Tampa and Royal Auction Group, Inc. for the provision of Auctioneer Services, for use by the Logistics and Asset Management Department/Fleet Division.",
+      "rawTitle": "File No. MAM25-15836\nResolution approving a Piggyback Agreement for Auctioneer Services between the City of Tampa and Royal Auction Group, Inc. for the provision of Auctioneer Services, for use by the Logistics and Asset Management Department/Fleet Division; authorizing the Mayor to execute said agreement; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 40,
+      "agendaItemId": null,
+      "fileNumber": "MAM25-15839",
+      "title": "File No. MAM25-15839 Resolution approving the bid of Moreno Industrial Services Inc. for the furnishing of Vision Zero Rapid Response – Concrete Services (Sheltered Market Solicitation) in the estimated amount of $294,384 over a three-year term for use by the Mobility Department.",
+      "rawTitle": "File No. MAM25-15839\nResolution approving the bid of Moreno Industrial Services Inc. for the furnishing of Vision Zero Rapid Response – Concrete Services (Sheltered Market Solicitation) in the estimated amount of $294,384 over a three-year term for use by the Mobility Department; authorizing the Director of Purchasing to purchase said property, supplies, materials or services; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$294,384"
+      ]
+    },
+    {
+      "number": 41,
+      "agendaItemId": null,
+      "fileNumber": "MAM25-16028",
+      "title": "File No. MAM25-16028 Resolution approving the renewal of an agreement between the City of Tampa and Quality Roofing, Inc., without a price escalation, for the furnishing of Roofing Services in the estimated amount of $2,000,000 for use by the Logistics & Asset Management Department/Facility Management Division.",
+      "rawTitle": "File No. MAM25-16028\nResolution approving the renewal of an agreement between the City of Tampa and Quality Roofing, Inc., without a price escalation, for the furnishing of Roofing Services in the estimated amount of $2,000,000 for use by the Logistics & Asset Management Department/Facility Management Division; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$2,000,000"
+      ]
+    },
+    {
+      "number": 42,
+      "agendaItemId": null,
+      "fileNumber": "MAM25-16029",
+      "title": "File No. MAM25-16029 Resolution approving the renewal of an award between the City of Tampa and TK Elevator Corporation, with a Consumer Price Index (CPI) increase of 2.3%, for the provision of Citywide Elevator Services in the estimated amount of $955,540 for use by the Logistics and Asset Management Department/Facility Management Division.",
+      "rawTitle": "File No. MAM25-16029\nResolution approving the renewal of an award between the City of Tampa and TK Elevator Corporation, with a Consumer Price Index (CPI) increase of 2.3%, for the provision of Citywide Elevator Services in the estimated amount of $955,540 for use by the Logistics and Asset Management Department/Facility Management Division; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$955,540"
+      ]
+    },
+    {
+      "number": 43,
+      "agendaItemId": null,
+      "fileNumber": "MAM25-16048",
+      "title": "File No. MAM25-16048 Resolution of the City of Tampa, Florida, supporting Florida house bill 987 which creates the honorary designation of that certain portion of U.S 92/S.R 600/Gandy Boulevard between S. West Shore Boulevard in the City of Tampa, Hillsborough County, Florida, and 4th Street N. in Pinellas county, Florida, as “Senator James A. Sebesta Memorial Highway”.",
+      "rawTitle": "File No. MAM25-16048\nResolution of the City of Tampa, Florida, supporting Florida house bill 987 which creates the honorary designation of that certain portion of U.S 92/S.R 600/Gandy Boulevard between S. West Shore Boulevard in the City of Tampa, Hillsborough County, Florida, and 4th Street N. in Pinellas county, Florida, as “Senator James A. Sebesta Memorial Highway”; providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 44,
+      "agendaItemId": null,
+      "fileNumber": "VAC-24-12",
+      "title": "File No. VAC-24-12 (UNAN)  - An ordinance of the City of Tampa, Florida, vacating, closing, discontinuing and abandoning a portion of Switzer Avenue right-of-way that lies within the Plat of the renamed Southside Subdivision as recorded in Book 4169, Page 1044, of the Official Records of Hillsborough County, Florida (\"O.R.\"), and a portion of Green Avenue right-of-way that lies within the Plat of Brobston-Fending Company's Half-Way Addition as recorded in O.R. Plat Book 2 at Page 78, and a portion of that unnamed and unplatted right-of-way that abuts Interbay Boulevard in Tampa, Florida, all of which are located North of Interbay Boulevard, South of Thornton Avenue, East of 1st Street, and West of Elkins Avenue and are more fully described in Section 2 hereof; subject to certain covenants, conditions and restrictions as more particularly set forth herein; providing for enforcement and penalties for violations; providing for definitions, interpretations and repealing conflicts; providing for severability; providing an effective date. ",
+      "rawTitle": "File No. VAC-24-12 (UNAN)\n(Ordinance being presented on second reading and adoption) - An ordinance of the City of Tampa, Florida, vacating, closing, discontinuing and abandoning a portion of Switzer Avenue right-of-way that lies within the Plat of the renamed Southside Subdivision as recorded in Book 4169, Page 1044, of the Official Records of Hillsborough County, Florida (\"O.R.\"), and a portion of Green Avenue right-of-way that lies within the Plat of Brobston-Fending Company's Half-Way Addition as recorded in O.R. Plat Book 2 at Page 78, and a portion of that unnamed and unplatted right-of-way that abuts Interbay Boulevard in Tampa, Florida, all of which are located North of Interbay Boulevard, South of Thornton Avenue, East of 1st Street, and West of Elkins Avenue and are more fully described in Section 2 hereof; subject to certain covenants, conditions and restrictions as more particularly set forth herein; providing for enforcement and penalties for violations; providing for definitions, interpretations and repealing conflicts; providing for severability; providing an effective date. (Original motion to approve said ordinance on first reading was initiated by Viera-Hurtak on July 17, 2025)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 45,
+      "agendaItemId": null,
+      "fileNumber": "VAC-25-07",
+      "title": "File No. VAC-25-07 (Hurtak & Clendenin no)  - An ordinance of the City of Tampa, Florida, vacating, closing, discontinuing and abandoning that alleyway located North of Abdella Street, South of Dewey Street, East of Mantanzas Avenue, and West of MacDill Avenue, within the Plat of John H. Drew's First Extension in the City of Tampa, Hillsborough County, Florida, as more fully described in Section 2 hereof, subject to certain covenants, conditions and restrictions as more particularly set forth herein; providing for enforcement and penalties for violations; providing for definitions, interpretations and repealing conflict; providing for severability; providing an effective date. ",
+      "rawTitle": "File No. VAC-25-07 (Hurtak & Clendenin no)\n(Ordinance being presented for second reading and adoption) - An ordinance of the City of Tampa, Florida, vacating, closing, discontinuing and abandoning that alleyway located North of Abdella Street, South of Dewey Street, East of Mantanzas Avenue, and West of MacDill Avenue, within the Plat of John H. Drew's First Extension in the City of Tampa, Hillsborough County, Florida, as more fully described in Section 2 hereof, subject to certain covenants, conditions and restrictions as more particularly set forth herein; providing for enforcement and penalties for violations; providing for definitions, interpretations and repealing conflict; providing for severability; providing an effective date. (Original motion to approve said ordinance on first reading was initiated by Maniscalco-Viera on July 17, 2025)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 46,
+      "agendaItemId": null,
+      "fileNumber": "HN25-15718",
+      "title": "File No. HN25-15718 (UNAN; Clendenin absent at vote) ( - An Ordinance of the City of Tampa, Florida, approving the naming of the multisports field at Forest Hills Park in Tampa, Florida, to honor Roland Paz, Sr.; providing an effective date. ",
+      "rawTitle": "File No. HN25-15718 (UNAN; Clendenin absent at vote)\n((Ordinance being presented for first reading consideration) - An Ordinance of the City of Tampa, Florida, approving the naming of the multisports field at Forest Hills Park in Tampa, Florida, to honor Roland Paz, Sr.; providing an effective date. (Original motion to approve said ordinance on first reading was initiated by Viera-Miranda on July 17, 2025)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 47,
+      "agendaItemId": null,
+      "fileNumber": "VAC-25-06",
+      "title": "File No. VAC-25-06 Public hearing for reconsideration on application by Steve Yerrid requesting to vacate part of West Dryad Street lying North of W Juno St, South of W San Miguel St, West of N Dundee St and East of Old Tampa Bay. (Motion to reconsider and set public hearing initiated by Clendenin-Viera on May 15, 2025)(Previously heard on May 1, 2025, at which a motion initiated by Carlson-Clendenin to deny the application was adopted with Miranda, Henderson, and Viera voting no)  - An ordinance of the City of Tampa, Florida, vacating, closing, discontinuing and abandoning a portion of West Dryad Street right-of-way located North of San Gable Court, South of San Miguel Street, East of Old Tampa Bay, and West of Dundee Street, within the Plat of Sunset Camp Subdivision in the City of Tampa, Hillsborough County, Florida, as more fully described in Section 2 hereof, subject to certain covenants, conditions and restrictions as more particularly set forth herein; providing for enforcement and penalties for violations; providing for definitions; interpretations and repealing conflicts; providing for severability; providing an effective date. Letter from Tyler Hudson, applicant's representative, requesting that said public hearing be continued to November 6, 2025. ",
+      "rawTitle": "File No. VAC-25-06\nPublic hearing for reconsideration on application by Steve Yerrid requesting to vacate part of West Dryad Street lying North of W Juno St, South of W San Miguel St, West of N Dundee St and East of Old Tampa Bay. (Motion to reconsider and set public hearing initiated by Clendenin-Viera on May 15, 2025)(Previously heard on May 1, 2025, at which a motion initiated by Carlson-Clendenin to deny the application was adopted with Miranda, Henderson, and Viera voting no)\n\n(Ordinance being presented for first reading consideration) - An ordinance of the City of Tampa, Florida, vacating, closing, discontinuing and abandoning a portion of West Dryad Street right-of-way located North of San Gable Court, South of San Miguel Street, East of Old Tampa Bay, and West of Dundee Street, within the Plat of Sunset Camp Subdivision in the City of Tampa, Hillsborough County, Florida, as more fully described in Section 2 hereof, subject to certain covenants, conditions and restrictions as more particularly set forth herein; providing for enforcement and penalties for violations; providing for definitions; interpretations and repealing conflicts; providing for severability; providing an effective date.\n\nLetter from Tyler Hudson, applicant's representative, requesting that said public hearing be continued to November 6, 2025. (To be R/F)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 48,
+      "agendaItemId": null,
+      "fileNumber": "E2025-8",
+      "title": "File No. E2025-8 CH 21 Public hearing to adopt the annual Stormwater Service Assessment within the incorporated boundaries of the City of Tampa for the purpose of paying for the provision of Stormwater Management Services in said area; and the adoption of the annual Non-Ad Valorem Assessment roll to be certified to the Tax Collector to bill for the Non-Ad Valorem Assessment.  Resolution of the City of Tampa, Florida, relating to the provision of Stormwater Management Services provided by the City's Stormwater Utility; imposing stormwater charges against developed property located in the Stormwater Service area for the Fiscal Year beginning October 1, 2025; approving the Stormwater Roll; directing that the Stormwater Roll be certified to the Hillsborough County Tax Collector; and providing an effective date.",
+      "rawTitle": "File No. E2025-8 CH 21\nPublic hearing to adopt the annual Stormwater Service Assessment within the incorporated boundaries of the City of Tampa for the purpose of paying for the provision of Stormwater Management Services in said area; and the adoption of the annual Non-Ad Valorem Assessment roll to be certified to the Tax Collector to bill for the Non-Ad Valorem Assessment. (Motion adopting resolution to schedule said public hearing initiated by Maniscalco-Hurtak on June 26, 2025)\n\nResolution of the City of Tampa, Florida, relating to the provision of Stormwater Management Services provided by the City's Stormwater Utility; imposing stormwater charges against developed property located in the Stormwater Service area for the Fiscal Year beginning October 1, 2025; approving the Stormwater Roll; directing that the Stormwater Roll be certified to the Hillsborough County Tax Collector; and providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 49,
+      "agendaItemId": null,
+      "fileNumber": "E2025-8",
+      "title": "File No. E2025-8 CH 21 Public hearing to adopt the Stormwater Capital Improvement Assessment Roll for the Central and Lower Basin Improvement Area within the incorporated boundaries of the City of Tampa for the purpose of paying for the provision of Stormwater Capital Improvement Projects in said area; and the adoption of the Annual Non-Ad Valorem Assessment Roll to be certified to the Tax Collector to bill for the Non-Ad Valorem Assessment.  Resolution of the City of Tampa, Florida, relating to the construction and funding of stormwater improvements by the City's Stormwater Utility; continuing imposition of Stormwater Improvement Assessments against certain real property within the Central and Lower Basin Improvement area; approving the Stormwater Roll; establishing the lien associated therewith; directing that the Stormwater Roll be certified to the Hillsborough County Tax Collector; and providing an effective date.",
+      "rawTitle": "File No. E2025-8 CH 21\nPublic hearing to adopt the Stormwater Capital Improvement Assessment Roll for the Central and Lower Basin Improvement Area within the incorporated boundaries of the City of Tampa for the purpose of paying for the provision of Stormwater Capital Improvement Projects in said area; and the adoption of the Annual Non-Ad Valorem Assessment Roll to be certified to the Tax Collector to bill for the Non-Ad Valorem Assessment. (Motion adopting resolution to schedule said public hearing initiated by Maniscalco-Hurtak on June 26, 2025)\n\nResolution of the City of Tampa, Florida, relating to the construction and funding of stormwater improvements by the City's Stormwater Utility; continuing imposition of Stormwater Improvement Assessments against certain real property within the Central and Lower Basin Improvement area; approving the Stormwater Roll; establishing the lien associated therewith; directing that the Stormwater Roll be certified to the Hillsborough County Tax Collector; and providing an effective date.",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 50,
+      "agendaItemId": null,
+      "fileNumber": "SU1-24-66-C",
+      "title": "**File No. SU1-24-66**-C (Will not be heard; Request to Withdraw) Continued review hearing from February 6, 2025 and May 15, 2025 on petition for review filed by Constantino Kastis, owner, requesting a review hearing regarding a decision of the Zoning Administrator, SU1-24-0000066, pertaining to the property located at 706 East Hugh Street.  Email from Stephen Michelini, applicant's representative, requesting that said review hearing be withdrawn. ",
+      "rawTitle": "File No. SU1-24-66-C (Will not be heard; Request to Withdraw)\nContinued review hearing from February 6, 2025 and May 15, 2025 on petition for review filed by Constantino Kastis, owner, requesting a review hearing regarding a decision of the Zoning Administrator, SU1-24-0000066, pertaining to the property located at 706 East Hugh Street. (Original motion to schedule said review hearing initiated by Clendenin-Miranda on November 7, 2024)\n\nEmail from Stephen Michelini, applicant's representative, requesting that said review hearing be withdrawn. (To be R/F)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 51,
+      "agendaItemId": null,
+      "fileNumber": "CM25-15693",
+      "title": "File No. CM25-15693 Staff to provide an in-person progress report on the TPD Impound, Evidence, and Forensics Capital Project; further, that said update should include: the current approved capital budget and spending to date by asset type (ex. land, project, management, construction, etc.); visual of current site plan, including parking and storage of any vehicle type; building design with room-by-room assessment and square footage assumptions; updated construction cost estimate; list of positions that will move from TPD HQ or other current locations to the new site; expected date Contract Administration intends to initiate the bid process; and expected completion date of construction. ",
+      "rawTitle": "File No. CM25-15693\nStaff to provide an in-person progress report on the TPD Impound, Evidence, and Forensics Capital Project; further, that said update should include: the current approved capital budget and spending to date by asset type (ex. land, project, management, construction, etc.); visual of current site plan, including parking and storage of any vehicle type; building design with room-by-room assessment and square footage assumptions; updated construction cost estimate; list of positions that will move from TPD HQ or other current locations to the new site; expected date Contract Administration intends to initiate the bid process; and expected completion date of construction. (Original motion initiated by Hurtak-Miranda on June 26, 2025)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 52,
+      "agendaItemId": null,
+      "fileNumber": "CM25-15201",
+      "title": "File No. CM25-15201 Staff to provide a presentation on a honorary street renaming for J. Leonard Levy and George Levy, preferably near Raymond James stadium.  Email from Phyllis Ho-Zuhars, Senior Executive Aide, transmitting a PowerPoint presentation for said agenda item. ",
+      "rawTitle": "File No. CM25-15201\nStaff to provide a presentation on a honorary street renaming for J. Leonard Levy and George Levy, preferably near Raymond James stadium. (Original motion initiated by Miranda-Carlson on June 5, 2025)\n\nEmail from Phyllis Ho-Zuhars, Senior Executive Aide, transmitting a PowerPoint presentation for said agenda item. (To be R/F)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 53,
+      "agendaItemId": null,
+      "fileNumber": "CM24-9124",
+      "title": "File No. CM24-9124 Code Enforcement to present a 5-minute report on monitoring the parking compliance in Ybor City; further, that Eric Cotton, Development Coordination Manager, or Abbey Feeley, Deputy Administrator for Development and Economic Opportunity, to be present to provide an update on the progress of getting parking lots into compliance.   Memorandum from Andrea Zelman, and Abbye Feeley, Deputy Administrator for Development and Economic Opportunity, requesting that said agenda item be continued to September 25, 2025. ",
+      "rawTitle": "File No. CM24-9124\nCode Enforcement to present a 5-minute report on monitoring the parking compliance in Ybor City; further, that Eric Cotton, Development Coordination Manager, or Abbey Feeley, Deputy Administrator for Development and Economic Opportunity, to be present to provide an update on the progress of getting parking lots into compliance. (Original motion initiated by Hurtak-Viera on June 27, 2024) (Next bi-monthly report to be scheduled for October 9, 2025)\n\nMemorandum from Andrea Zelman, and Abbye Feeley, Deputy Administrator for Development and Economic Opportunity, requesting that said agenda item be continued to September 25, 2025. (To be R/F)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 54,
+      "agendaItemId": null,
+      "fileNumber": "CM24-8549",
+      "title": "File No. CM24-8549 Staff and the Legal Department to come back with an ordinance that is consistent with state laws on incentives that can be used in the City of Tampa for contractors regarding apprenticeships; that Brenda McKenzie, Workforce Partnerships and Special Projects Director, provide briefing on what the apprenticeship law has done; further that the Contracting Community and the Union be a part of it.  Memorandum from Justin Vaske, Senior Assistant City Attorney, transmitting a written response for said agenda item. ",
+      "rawTitle": "File No. CM24-8549\nStaff and the Legal Department to come back with an ordinance that is consistent with state laws on incentives that can be used in the City of Tampa for contractors regarding apprenticeships; that Brenda McKenzie, Workforce Partnerships and Special Projects Director, provide briefing on what the apprenticeship law has done; further that the Contracting Community and the Union be a part of it. (Original motion initiated by Viera-Miranda on August 29, 2024)(Updated motion initiated by Viera-Hurtak on October 3, 2024)(Motion to reschedule from February 20, 2025 to April 17, 2025 initiated by Viera-Carlson on February 6, 2025)(Continued from April 17, 2025)\n\nMemorandum from Justin Vaske, Senior Assistant City Attorney, transmitting a written response for said agenda item. (To be R/F)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 55,
+      "agendaItemId": null,
+      "fileNumber": "CM25-13970",
+      "title": "File No. CM25-13970 City Council Attorney to work with the Legal Department and bring back a draft ordinance that creates a Charter Review Advisory Commission, pursuant to Section 10.10 of the City Charter, for Council’s review and discussion  Email from Martin Shelby, Council Attorney, transmitting background material for said agenda item. ",
+      "rawTitle": "File No. CM25-13970\nCity Council Attorney to work with the Legal Department and bring back a draft ordinance that creates a Charter Review Advisory Commission, pursuant to Section 10.10 of the City Charter, for Council’s review and discussion (Original motion initiated by Maniscalco-Miranda on April 17, 2025)(Updated motion initiated by Clendenin-Maniscalco on June 26, 2025)\n\nEmail from Martin Shelby, Council Attorney, transmitting background material for said agenda item. (To be R/F)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 56,
+      "agendaItemId": null,
+      "fileNumber": "CM25-13970",
+      "title": "File No. CM25-13970 City Council to have a discussion on the rules of the committee and the general themes that Council would like for the committee to discuss. ",
+      "rawTitle": "File No. CM25-13970\nCity Council to have a discussion on the rules of the committee and the general themes that Council would like for the committee to discuss. (Original motion initiated by Maniscalco-Miranda on April 17, 2025)(Updated motion initiated by Carlson-Hurtak on June 26, 2025)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 57,
+      "agendaItemId": null,
+      "fileNumber": "CM24-4303",
+      "title": "File No. CM24-4303 Abbye Feeley, Administrator for Development and Economic Opportunity, to appear and report on the Land Development Code Reform Process.  Memorandum from Abbye Feeley, Deputy Administrator for Development and Economic Opportunity, requesting that said agenda item be continued to September 4, 2025. ",
+      "rawTitle": "File No. CM24-4303\nAbbye Feeley, Administrator for Development and Economic Opportunity, to appear and report on the Land Development Code Reform Process. (Original motion initiated by Hurtak-Henderson on March 28, 2024)(Next monthly report to be provided on September 4, 2025)\n\nMemorandum from Abbye Feeley, Deputy Administrator for Development and Economic Opportunity,  requesting that said agenda item be continued to September 4, 2025. (To be R/F)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 58,
+      "agendaItemId": null,
+      "fileNumber": "CM24-9964",
+      "title": "File No. CM24-9964 Staff to present a 5-minute in-person report on an overview of the soon-to-be completed Lower Peninsular Watershed Plan Project; further, that the overview should include the following: 1) The project approval timeline from 2019-2024; 2) Detail of the cost components for Design Services including amendments, GMP agreement, and any change orders with Kimmins; 3) Detail of additional work effort that consumed any of the $400k City controlled and $3M Kimmins controlled contingency funds; 4) Detail of any non-Kimmins costs; 5) Description of deliverables associated with the construction (ex. linear feet of box culvert, 9-acre pond, storm drainage, roads resurfaced, park amenities, etc.): 6) Key implementation dates and reasons for variances from original vendor deadlines; 7) Financial comparison of budget to actual for project #1000750; 8) Options for use of unused Capital funds, if any; 9) Soft and Hard benefits the City can expect from this investment; and 10) Any other pertinent details staff believes would be helpful.  (Motion to schedule to August 7, 2025 initiated by Hurtak-Miranda on June 26, 2025) Memorandum from Jean Duncan, Administrator of Infrastructure and Mobility, requesting that said agenda item be continued to October 23, 2025. ",
+      "rawTitle": "File No. CM24-9964\nStaff to present a 5-minute in-person report on an overview of the soon-to-be completed Lower Peninsular Watershed Plan Project; further, that the overview should include the following: 1) The project approval timeline from 2019-2024; 2) Detail of the cost components for Design Services including amendments, GMP agreement, and any change orders with Kimmins; 3) Detail of additional work effort that consumed any of the $400k City controlled and $3M Kimmins controlled contingency funds; 4) Detail of any non-Kimmins costs; 5) Description of deliverables associated with the construction (ex. linear feet of box culvert, 9-acre pond, storm drainage, roads resurfaced, park amenities, etc.): 6) Key implementation dates and reasons for variances from original vendor deadlines; 7) Financial comparison of budget to actual for project #1000750; 8) Options for use of unused Capital funds, if any; 9) Soft and Hard benefits the City can expect from this investment; and 10) Any other pertinent details staff believes would be helpful. (Original motion initiated by Hurtak-Clendenin on November 7, 2024) (Motion to reschedule from December 19, 2024 initiated by Hurtak-Clendenin on November 21, 2024)(Continued from February 20, 2025)(Motion to reschedule to a future date initiated by Hurtak-Clendenin on May 15, 2025)(Motion to schedule to August 7, 2025 initiated by Hurtak-Miranda on June 26, 2025)\n\nMemorandum from Jean Duncan, Administrator of Infrastructure and Mobility, requesting that said agenda item be continued to October 23, 2025. (To be R/F)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": [
+        "$400",
+        "$3"
+      ]
+    },
+    {
+      "number": 59,
+      "agendaItemId": null,
+      "fileNumber": "CM25-13400",
+      "title": "File No. CM25-13400 Chief Barbara Tripp, Tampa Fire Rescue, to provide a monthly written report on the status of the bunker gear data for all stations.   Memorandum from the Chief Barbara Tripp, Tampa Fire Rescue, transmitting a written response for said agenda item. ",
+      "rawTitle": "File No. CM25-13400\nChief Barbara Tripp, Tampa Fire Rescue, to provide a monthly written report on the status of the bunker gear data for all stations. (Original motion initiated by Henderson-Hurtak on March 27, 2025) (Next monthly written report scheduled for September 4, 2025)\n\nMemorandum from the Chief Barbara Tripp, Tampa Fire Rescue, transmitting a written response for said agenda item. (To be R/F)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 60,
+      "agendaItemId": null,
+      "fileNumber": "CM25-16023",
+      "title": "File No. CM25-16023 Administration to provide a written report stating their position on moving the source of funding for the Disability Internship Program from SAAF budget to the general budget.  Memorandum from Ocea Wynn, Administrator of Neighborhood and Community Affairs, transmitting a written response for said agenda item. ",
+      "rawTitle": "File No. CM25-16023\nAdministration to provide a written report stating their position on moving the source of funding for the Disability Internship Program from SAAF budget to the general budget. (Original motion initiated by Viera-Maniscalco on July 17, 2025)\n\nMemorandum from Ocea Wynn, Administrator of Neighborhood and Community Affairs, transmitting a written response for said agenda item. (To be R/F)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    },
+    {
+      "number": 61,
+      "agendaItemId": null,
+      "fileNumber": "CM25-16021",
+      "title": "File No. CM25-16021 Staff to provide a written report regarding the timeline for renaming of the Harrison Boonstoppel sign at New Tampa All Abilities Park, including the status of the requested plaque for the late Harrison Boonstoppel. (Original initiated by Viera-Maniscalco on July 17, 2025) Memorandum from Ocea Wynn, Administrator of Neighborhood and Community Affairs, transmitting a written response for said agenda item. ",
+      "rawTitle": "File No. CM25-16021\nStaff to provide a written report regarding the timeline for renaming of the Harrison Boonstoppel sign at New Tampa All Abilities Park, including the status of the requested plaque for the late Harrison Boonstoppel. (Original initiated by Viera-Maniscalco on July 17, 2025)\n\nMemorandum from Ocea Wynn, Administrator of Neighborhood and Community Affairs, transmitting a written response for said agenda item. (To be R/F)",
+      "background": "",
+      "supportingDocuments": [],
+      "dollarAmounts": []
+    }
+  ],
+  "totalDollarAmount": 22140759.33,
+  "formattedTotalDollarAmount": "$22,140,759.33"
+}
