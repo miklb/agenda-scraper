@@ -347,8 +347,25 @@ function extractDollarAmounts(text) {
  * @returns {string|null} - Extracted file number or null if not found
  */
 function extractFileNumber(text) {
+    // Pattern 1: Standard "File No. XXXX" format
     const fileNoMatch = text.match(/File No\. ([A-Z\/\d-]+)/i);
-    return fileNoMatch ? fileNoMatch[1] : null;
+    if (fileNoMatch) {
+        return fileNoMatch[1];
+    }
+    
+    // Pattern 2: Direct file number pattern (for items without "File No." prefix)
+    // Matches patterns like CM25-13759, E2025-15, PS25-15649, etc.
+    const directFileMatch = text.match(/^([A-Z]{1,5}\d{2,4}-\d{4,6}(?:-[A-Z])?)/i);
+    if (directFileMatch) {
+        return directFileMatch[1];
+    }
+    
+    // Pattern 3: Special cases
+    if (text.trim() === 'Administration Update') {
+        return null; // This item genuinely has no file number
+    }
+    
+    return null;
 }
 
 /**
@@ -435,15 +452,45 @@ async function scrapeWithSelenium(url, meetingId, meetingType = 'regular') {
         // Look for agenda items with proper File Numbers (using working selector)
         let agendaItems = [];
         
-        // Look specifically for links with "File No." that are actual agenda items
+        // Look specifically for links that are actual agenda items
         $('a[id^="lnk"]').each((i, link) => {
             const $link = $(link);
             const text = $link.text().trim();
             const href = $link.attr('href');
             const id = $link.attr('id');
             
-            // Only include items that start with "File No." and look like actual agenda items
-            if (text.startsWith('File No.') && text.length > 10) {
+            // Function to determine if this is an agenda item link
+            function isAgendaItemLink(text) {
+                // Skip if text is too short or empty
+                if (!text || text.length < 5) return false;
+                
+                // Include if it starts with "File No."
+                if (text.startsWith('File No.')) return true;
+                
+                // Include if it matches a direct file number pattern
+                if (text.match(/^[A-Z]{1,5}\d{2,4}-\d{4,6}/i)) return true;
+                
+                // Include special cases
+                if (text.trim() === 'Administration Update') return true;
+                
+                // Exclude obvious non-agenda items
+                const excludePatterns = [
+                    /^download/i,
+                    /^view/i,
+                    /^\s*$/,
+                    /^print/i,
+                    /^email/i
+                ];
+                
+                for (const pattern of excludePatterns) {
+                    if (pattern.test(text)) return false;
+                }
+                
+                return false;
+            }
+            
+            // Only include items that are actual agenda items
+            if (isAgendaItemLink(text)) {
                 // Initialize with null agenda item ID
                 let agendaItemId = null;
                 

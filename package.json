@@ -1,6 +1,6 @@
 {
   "name": "agenda-scraper",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Scrape City of Tampa agendas, store as structured JSON, and generate WordPress block markup with enhanced navigation and formatting.",
   "main": "agenda-scraper.js",
   "scripts": {
